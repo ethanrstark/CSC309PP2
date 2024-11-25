@@ -1,0 +1,190 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+
+model User {
+  id         Int       @id @default(autoincrement())
+
+  userName   String    @unique
+  firstName  String 
+  lastName   String 
+  email      String    @unique
+  password   String 
+  avatar     String    @default("TODO") // TODO: add a default avatar for the user
+  phoneNum   String?
+  role       String    @default("USER") // Enforce this to be USER or ADMIN in APIs
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  // Relations:
+  posts      BlogPost[]
+  templates  CodeTemplate[]
+  comments   Comment[]
+  reports    Report[]
+  tokens     Token[]
+  blogRatings BlogRating[]
+  commentRatings CommentRating[]
+}
+
+
+model Token {
+  id            Int       @id @default(autoincrement())
+  refreshToken  String    @unique 
+  userId        Int 
+  createdAt     DateTime  @default(now())
+
+  // Relations:
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+
+model BlogPost {
+  id            Int             @id @default(autoincrement())
+  title         String
+  description   String
+  authorId      Int
+  isHidden      Boolean         @default(false)
+  hiddenReason  String?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt 
+  upvoteCount   Int             @default(0)
+  downvoteCount Int             @default(0)
+
+  // Relations:
+  author        User            @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  tags          Tag[]
+  comments      Comment[]  
+  templates     CodeTemplate[] 
+  ratings       BlogRating[]  
+  reports       Report[]           
+}
+
+
+model BlogRating {
+  id        Int       @id @default(autoincrement())
+  isUpvote  Boolean   // True for upvote or false for downvote, TODO: could change this to integer value later
+  postId    Int
+  userId    Int
+
+  @@unique([userId, postId]) // Each user can only vote once on a post
+
+  // Relations:
+  post    BlogPost    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user    User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+
+model CodeTemplate {
+  id           Int               @id @default(autoincrement())
+  title        String 
+  userId       Int
+  explanation  String
+  code         String 
+  file_name    String 
+  language     String            // Enforce this to be C, CPP, JAVA, PYTHON, or JS 
+  isFork       Boolean           @default(false)
+  originalId   Int?              // References original template if forked
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  
+  // Relations:  
+  user         User              @relation(fields: [userId], references: [id], onDelete: Cascade) 
+  original     CodeTemplate?     @relation("Forks", fields: [originalId], references: [id], onDelete: SetNull)
+  blogPosts    BlogPost[] 
+  tags         Tag[]
+  childForks   CodeTemplate[]    @relation("Forks")
+  environment  ExecutionEnvironment?
+}
+
+
+model Tag {
+  id         Int             @id @default(autoincrement())
+  name       String          @unique
+
+  // Relations:
+  templates  CodeTemplate[]
+  blogPosts  BlogPost[]
+}
+
+
+model Comment {
+  id            Int              @id @default(autoincrement())
+  content       String      
+  authorId      Int      
+  parentId      Int?             // For replies to comments
+  postId        Int      
+  isHidden      Boolean          @default(false) // For comments that are flagged to be hidden
+  hiddenReason  String?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  upvoteCount   Int              @default(0)
+  downvoteCount Int              @default(0)
+      
+  // Relations:      
+  author        User             @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  parent        Comment?         @relation("CommentReplies", fields: [parentId], references: [id], onDelete: SetNull)
+  replies       Comment[]        @relation("CommentReplies")
+  post          BlogPost         @relation(fields: [postId], references: [id], onDelete: Cascade)
+  ratings       CommentRating[]
+  reports       Report[]
+}
+
+
+
+model CommentRating {
+  id         Int      @id @default(autoincrement())
+  isUpvote  Boolean   // True for upvote or false for downvote, TODO: could change this to integer value later
+  userId     Int  
+  commentId  Int  
+
+  @@unique([userId, commentId]) // Each user can only vote once on a post
+  
+  // References:
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comment    Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
+}
+
+
+model Report {
+  id         Int        @id @default(autoincrement())
+  reason     String     
+  userId     Int 
+  commentId  Int?       
+  postId     Int?       
+  createdAt  DateTime   @default(now())
+ 
+  // Relations: 
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comment    Comment?   @relation(fields: [commentId], references: [id], onDelete: SetNull)
+  post       BlogPost?  @relation(fields: [postId], references: [id], onDelete: SetNull)
+} 
+// TODO: either commentId or postId has to be non-null (but they cant both be non-null)
+// so enforce this in the API
+
+
+// I'm not really sure about this one, I think we will make it more concrete in part 2
+model ExecutionEnvironment {
+  id          Int           @id @default(autoincrement())
+  templateId  Int           @unique
+  input       String? 
+  output      String?  
+  error       String?  
+  memoryUsed  Int
+  timeTaken   Int
+  executedAt  DateTime      @default(now())
+
+  // Relations:
+  template    CodeTemplate  @relation(fields: [templateId], references: [id], onDelete: Cascade) // TODO depending on implementation we may want to RESTRICT onDelete
+} 

@@ -1,0 +1,6 @@
+{"testUrlHidingContent": "http://localhost:3000/api/admin/hide_content",
+"hiddencontentbody": {
+    "postId": 1,
+    "reason": "Inappropriate content"
+  },
+"testUrlFindingHiddenContent": "http://localhost:3000/api/admin/hide_content"}

@@ -1,0 +1,21 @@
+{
+  "singleQuote": false,
+  "trailingComma": "es5",
+  "tabWidth": 4,
+  "useTabs": false,
+  "semi": true,
+  "printWidth": 100,
+  "bracketSpacing": true,
+  "jsxBracketSameLine": false,
+  "quoteProps": "consistent",
+  "endOfLine": "auto",
+  "arrowParens": "always",
+  "overrides": [
+    {
+      "files": "*.prisma",
+      "options": {
+        "singleQuote": false
+      }
+    }
+  ]
+}
