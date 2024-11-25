@@ -73,7 +73,15 @@ async function handler(req: AuthenticatedRequest, res: NextApiResponse) {
 
         // TODO I think we should first check that the req.user.username === the query username, i.e. the person trying to update the profile is the owner of that profile
         // TODO I also think we either shouldn't let them update their email or check that it is unique (isn't used with another account)
+        if (email){
+            const emailExist = await prisma.user.findUnique({
+                where : {email}
+            })
 
+            if (emailExist) {
+                return res.status(400).json({ error: "Email already exists. Please provide a different one" });
+            }
+        }
         // Check if username already exists
         if (username) {
             const userExist = await prisma.user.findUnique({
@@ -81,7 +89,7 @@ async function handler(req: AuthenticatedRequest, res: NextApiResponse) {
             });
 
             if (userExist) {
-                return res.status(400).json({ error: "Username already exists" });
+                return res.status(400).json({ error: "Username already exists. Please provide a different one" });
             }
         }
 

@@ -67,37 +67,56 @@ async function handler(req: AuthenticatedRequest, res: NextApiResponse) {
         } // TODO: You had this if check commented out, but I wasn't sure if it should be uncommented or not
 
         // Prepare tags for the template
-        const newTags: { name: string }[] = [];
-        const existingTags: { name: string }[] = [];
-        for (const tagName of tags || []) {
-            const tag = await prisma.tag.findUnique({
-                where: { name: tagName },
+        if (tags){
+            const newTags: { name: string }[] = [];
+            const existingTags: { name: string }[] = [];
+            for (const tagName of tags || []) {
+                const tag = await prisma.tag.findUnique({
+                    where: { name: tagName },
+                });
+
+                if (!tag) {
+                    newTags.push({ name: tagName });
+                } else {
+                    existingTags.push({ name: tagName });
+                }
+            }
+            // Update the template
+            const updatedTemplate = await prisma.codeTemplate.update({
+                where: { id: templateId },
+                data: {
+                    title,
+                    explanation,
+                    code,
+                    file_name,
+                    language,
+                    tags: {
+                        connect: existingTags,
+                        create: newTags,
+                    },
+                },
             });
 
-            if (!tag) {
-                newTags.push({ name: tagName });
-            } else {
-                existingTags.push({ name: tagName });
-            }
-        }
-
-        // Update the template
-        const updatedTemplate = await prisma.codeTemplate.update({
-            where: { id: templateId },
-            data: {
-                title,
-                explanation,
-                code,
-                file_name,
-                language,
-                tags: {
-                    connect: existingTags,
-                    create: newTags,
+            return res.status(200).json(updatedTemplate);
+        }else{
+            // Update the template
+            const updatedTemplate = await prisma.codeTemplate.update({
+                where: { id: templateId },
+                data: {
+                    title,
+                    explanation,
+                    code,
+                    file_name,
+                    language
+                   
                 },
-            },
-        });
+            });
 
-        return res.status(200).json(updatedTemplate);
+            return res.status(200).json(updatedTemplate);
+        }
+        
+
+        
     } catch (error: any) {
         return res.status(500).json({ error: "Code template update unsuccessful" });
         // TODO: I changed it to a 500 status code, but you had it as a 400 status code

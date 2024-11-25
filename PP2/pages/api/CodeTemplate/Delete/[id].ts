@@ -32,7 +32,7 @@ async function handler(req: AuthenticatedRequest, res: NextApiResponse) {
         if (!template) {
             return res.status(404).json({ error: "Code template does not exist" });
         }
-
+        
         if (template.userId !== req.user.id) {
             return res
                 .status(403)
