@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/utils/db";
 import { verifyAccessToken } from "@/utils/auth";
+import { UserPayload } from "@/constants";
 import { COMMENT_LIMIT, SortOptionType, HiddenCheckType } from "@/constants";
 
 /*
@@ -17,7 +18,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     const token = req.headers.authorization;
-    const user = token ? verifyAccessToken(token) : null;
+    const user: UserPayload | null = token ? (verifyAccessToken(token) as unknown as UserPayload) : null;
 
     const {
         page = "1",
@@ -95,9 +96,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         });
 
         res.status(200).json({
-            data: comments,
-            pageNum,
-            pageLimit,
+            comments,
             commentCount,
         });
     } catch (error: any) {

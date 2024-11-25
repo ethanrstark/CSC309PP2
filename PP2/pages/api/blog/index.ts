@@ -1,7 +1,7 @@
 import prisma from "@/utils/db";
 import { verifyAccessToken } from "@/utils/auth";
 import { NextApiRequest, NextApiResponse } from "next";
-import { BLOG_POST_LIMIT, validSortOrders, validSortByFields, SortOptionType, HiddenCheckType } from '@/constants';
+import { BLOG_POST_LIMIT, validSortOrders, validSortByFields, SortOptionType, HiddenCheckType, UserPayload } from '@/constants';
 
 
 /*
@@ -18,7 +18,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     const token = req.headers.authorization || "";
-    const user = token ? verifyAccessToken(token) : null;
+    const user: UserPayload | null = token ? (verifyAccessToken(token) as unknown as UserPayload) : null;
     const {
         page = "1",
         limit = `${BLOG_POST_LIMIT}`,
@@ -86,9 +86,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         });
 
         res.status(200).json({
-            data: blogPosts,
-            pageNum,
-            pageLimit,
+            blogPosts,
             postCount,
         });
     } catch (error: any) {

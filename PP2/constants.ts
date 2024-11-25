@@ -1,18 +1,21 @@
 import { NextApiRequest } from "next";
 
-export const BLOG_POST_LIMIT: number = 15;
+export const BLOG_POST_LIMIT: number = 5;
 export const COMMENT_LIMIT: number = 15;
 export const TAG_LIMIT: number = 5;
 export const CODE_TEMPLATE_LIMIT: number = 2;
 
+// UserPayload object type definition
+export interface UserPayload {
+    id: number;
+    userName: string;
+    email: string;
+    role: "ADMIN" | "USER";
+};
+
 // Custom request type to include user property
 export interface AuthenticatedRequest extends NextApiRequest {
-    user: {
-        id: number;
-        userName: string;
-        email: string;
-        role: "ADMIN" | "USER";
-    };
+    user: UserPayload;
 }
 
 // Array for valid languages

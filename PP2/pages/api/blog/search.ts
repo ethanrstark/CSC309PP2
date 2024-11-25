@@ -7,6 +7,7 @@ import {
     validSortByFields,
     SortOptionType,
     HiddenCheckType,
+    UserPayload,
 } from "@/constants";
 
 
@@ -25,7 +26,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     const token = req.headers.authorization || "";
-    const user = token ? verifyAccessToken(token) : null;
+    const user: UserPayload | null = token ? (verifyAccessToken(token) as unknown as UserPayload) : null;
 
     let {
         title = "",
@@ -172,9 +173,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         });
 
         res.status(200).json({
-            data: blogPosts,
-            pageNum,
-            pageLimit,
+            blogPosts,
             postCount,
         });
     } catch (error: any) {

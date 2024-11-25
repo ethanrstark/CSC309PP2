@@ -1,14 +1,8 @@
 import { verifyAccessToken } from "@/utils/auth";
 import { NextApiRequest, NextApiResponse } from "next";
-import { AuthenticatedRequest } from "@/constants";
+import { AuthenticatedRequest, UserPayload } from "@/constants";
 
-// UserPayload object type definition
-interface UserPayload {
-    id: number;
-    userName: string;
-    email: string;
-    role: "ADMIN" | "USER";
-};
+
 
 // Function authenticates that access token is valid
 export function verification(
@@ -53,7 +47,7 @@ export function verificationAdmin(
             }
 
             req.user = user as UserPayload;
-            if (user.role !== "ADMIN") {
+            if (req.user.role !== "ADMIN") {
                 return res.status(403).json({ error: "Not an Admin, Authentication unsuccessful" });
             }
 

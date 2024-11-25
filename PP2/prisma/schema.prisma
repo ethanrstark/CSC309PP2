@@ -22,7 +22,7 @@ model User {
   lastName   String 
   email      String    @unique
   password   String 
-  avatar     String    @default("TODO") // TODO: add a default avatar for the user
+  avatar     String    @default("/defaultAvatar.png")
   phoneNum   String?
   role       String    @default("USER") // Enforce this to be USER or ADMIN in APIs
   createdAt  DateTime  @default(now())
@@ -74,7 +74,7 @@ model BlogPost {
 
 model BlogRating {
   id        Int       @id @default(autoincrement())
-  isUpvote  Boolean   // True for upvote or false for downvote, TODO: could change this to integer value later
+  isUpvote  Boolean   // True for upvote or false for downvote
   postId    Int
   userId    Int
 
@@ -145,7 +145,7 @@ model Comment {
 
 model CommentRating {
   id         Int      @id @default(autoincrement())
-  isUpvote  Boolean   // True for upvote or false for downvote, TODO: could change this to integer value later
+  isUpvote  Boolean   // True for upvote or false for downvote
   userId     Int  
   commentId  Int  
 
@@ -170,8 +170,6 @@ model Report {
   comment    Comment?   @relation(fields: [commentId], references: [id], onDelete: SetNull)
   post       BlogPost?  @relation(fields: [postId], references: [id], onDelete: SetNull)
 } 
-// TODO: either commentId or postId has to be non-null (but they cant both be non-null)
-// so enforce this in the API
 
 
 // I'm not really sure about this one, I think we will make it more concrete in part 2
@@ -188,3 +186,4 @@ model ExecutionEnvironment {
   // Relations:
   template    CodeTemplate  @relation(fields: [templateId], references: [id], onDelete: Cascade) // TODO depending on implementation we may want to RESTRICT onDelete
 } 
+// TODO: Probably can safely delete this model
