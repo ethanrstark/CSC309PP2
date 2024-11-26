@@ -1,7 +1,8 @@
 import { NextApiRequest } from "next";
 
 export const BLOG_POST_LIMIT: number = 5;
-export const COMMENT_LIMIT: number = 15;
+export const COMMENT_LIMIT: number = 10;
+export const REPLIES_LIMIT: number = 5;
 export const TAG_LIMIT: number = 5;
 export const CODE_TEMPLATE_LIMIT: number = 2;
 

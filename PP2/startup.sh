@@ -12,6 +12,8 @@ EOL
 npm i bcrypt
 npm i jsonwebtoken
 npm i multer
+npm i jwt-decode
+npm i @heroicons/react
 npm i prisma @prisma/client @prisma/studio
 npx prisma generate
 npx prisma migrate dev

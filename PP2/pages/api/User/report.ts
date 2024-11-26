@@ -42,7 +42,17 @@ async function handler(req: AuthenticatedRequest, res: NextApiResponse) {
 
             // If the post exists, create a report
             if (post) {
-                const report = await prisma.report.create({
+                const reportExists = await prisma.report.findFirst({
+                    where: {
+                        userId,
+                        postId,
+                    },
+                });
+                if (reportExists) {
+                    return res.status(409).json({ error: "Post already reported" });
+                }
+
+                await prisma.report.create({
                     data: {
                         userId,
                         postId,
@@ -64,7 +74,17 @@ async function handler(req: AuthenticatedRequest, res: NextApiResponse) {
 
             // If the comment exists, create a report
             if (comment) {
-                const report = await prisma.report.create({
+                const reportExists = await prisma.report.findFirst({
+                    where: {
+                        userId,
+                        commentId,
+                    },
+                });
+                if (reportExists) {
+                    return res.status(409).json({ error: "Comment already reported" });
+                }
+
+                await prisma.report.create({
                     data: {
                         userId: userId,
                         commentId: commentId,
