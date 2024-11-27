@@ -448,42 +448,45 @@ export default function My_Templates(){
     }
       return (
        
-        <div className="container mx-auto px-4 py-6"> <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
-      rel="stylesheet"
-    />
+        <div className="min-h-screen bg-gray-900 text-white">
+        <link
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+          rel="stylesheet"
+        />
+        
+        <div className="container mx-auto px-4 py-6">
           <div className="flex mb-4">
             {/* Search Bar Section */}
             <div className="flex flex-col w-full md:w-1/3 mr-4">
-              <label htmlFor="titleSearch" className="text-sm font-semibold text-gray-700">
+              <label htmlFor="titleSearch" className="text-sm font-semibold text-gray-300">
                 Search by Title:
               </label>
               <input
                 id="titleSearch"
                 type="text"
-                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md"
+                className="mt-1 block w-full px-4 py-2 border border-gray-600 rounded-md bg-gray-800 text-white"
                 value={titleFilter}
                 onChange={(e) => setTitleFilter(e.target.value)}
                 placeholder="Search by title"
               />
             </div>
-    
+      
             <div className="flex flex-col w-full md:w-1/3 mr-4">
-              <label htmlFor="descriptionSearch" className="text-sm font-semibold text-gray-700">
+              <label htmlFor="descriptionSearch" className="text-sm font-semibold text-gray-300">
                 Search by Description:
               </label>
               <input
                 id="descriptionSearch"
                 type="text"
-                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md"
+                className="mt-1 block w-full px-4 py-2 border border-gray-600 rounded-md bg-gray-800 text-white"
                 value={descriptionFilter}
                 onChange={(e) => setDescriptionFilter(e.target.value)}
                 placeholder="Search by description"
               />
             </div>
-    
+      
             <div className="flex flex-col w-full md:w-1/3">
-              <label htmlFor="tagsSearch" className="text-sm font-semibold text-gray-700">
+              <label htmlFor="tagsSearch" className="text-sm font-semibold text-gray-300">
                 Filter by Tags:
               </label>
               <Select
@@ -495,231 +498,249 @@ export default function My_Templates(){
                 classNamePrefix="react-select"
                 placeholder="Select tags"
                 components={{ SingleValue: customSingleValue }}
+                styles={{
+                  control: (provided) => ({
+                    ...provided,
+                    backgroundColor: '#2D3748', // Dark background for the select input
+                    borderColor: '#4A5568', // Dark border for the select input
+                  }),
+                  option: (provided) => ({
+                    ...provided,
+                    backgroundColor: '#4A5568', // Dark background for options
+                    color: '#E2E8F0', // Light color for option text
+                  }),
+                }}
               />
-             <div className="flex justify-between mt-4">
-            <button
-      className="bg-blue-500 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-600 transition duration-200 disabled:bg-gray-300"
-      onClick={() => handleTagPageChange(tagPage - 1)}
-      disabled={tagPage === 1}
-    >
-      <i className="fas fa-chevron-left"></i> {/* Left arrow icon */}
-    </button>
-    <span className="text-gray-700">Page {tagPage} of {totalTagPage}</span>
-    
-    <button
-      className="bg-blue-500 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-600 transition duration-200 disabled:bg-gray-300"
-      onClick={() => handleTagPageChange(tagPage + 1)}
-      disabled={tagPage === totalTagPage}
-    >
-      <i className="fas fa-chevron-right"></i> {/* Right arrow icon */}
-    </button>
-    </div>
-    </div>
+              <div className="flex justify-between mt-4">
+                <button
+                  className="bg-blue-500 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-600 transition duration-200 disabled:bg-gray-300"
+                  onClick={() => handleTagPageChange(tagPage - 1)}
+                  disabled={tagPage === 1}
+                >
+                  <i className="fas fa-chevron-left"></i>
+                </button>
+                <span className="text-gray-300">Page {tagPage} of {totalTagPage}</span>
+                
+                <button
+                  className="bg-blue-500 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-600 transition duration-200 disabled:bg-gray-300"
+                  onClick={() => handleTagPageChange(tagPage + 1)}
+                  disabled={tagPage === totalTagPage}
+                >
+                  <i className="fas fa-chevron-right"></i>
+                </button>
+              </div>
+            </div>
           </div>
-    
+        
           {/* Template Table */}
           {noTemplates ? (
-      <div className="text-center p-4">
-        <p className="text-lg text-gray -500">No Templates Found</p>
-      </div>
-          ):( <div className="overflow-x-auto">
-            <table className="min-w-full table-auto">
-              <thead>
-                <tr>
-                  <th className="px-4 py-2 text-left">Title</th>
-                  <th className="px-4 py-2 text-left">Description</th>
-                  <th className="px-4 py-2 text-left">Owner</th>
-                  <th className="px-4 py-2 text-left">Last Modified</th>
-                  <th className="px-4 py-2 text-left">Tags</th>
-                  <th className="px-4 py-2 text-left">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {templates.map((template) => (
-                  <tr key={template.id} className="border-t">
-                    <td className="px-4 py-2">{template.title}</td>
-                    <td className="px-4 py-2">{template.explanation}</td>
-                    <td className="px-4 py-2">{template.user.userName}</td>
-                    <td className="px-4 py-2">{new Date(template.updatedAt).toLocaleDateString()}</td>
-                    
-                         {/* Display tags */}
-      <div className="flex flex-wrap gap-2">
-        {template.tags && template.tags.length > 0 ? (
-          template.tags.map((tag:{name:string,id:number}) => (
-            <span
-              key={tag.id}
-              className="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm"
-            >
-              {tag.name}
-              <button
-                        onClick={() => {setTagDel(true) 
-                            handleTagRemove(template.id, tag.id)}}
-                        className="ml-2 text-red-500 hover:text-red-700"
-                      >
-                        <i className="fas fa-times"></i> {/* "X" icon */}
-                      </button>
-            </span>
-          ))
-        ) : (
-          <span className="text-gray-500">No Tags</span>
-        )}
-      </div><td className="px-4 py-2 text-center">
-                        <div  className="flex space-x-4">
-                      <button className="text-green-500 hover:text-green-700 flex items-center space-x-2">
-                        <i className="fas fa-play-circle"></i> {/* Use the play icon  TODO: ATTACH THE CODE EDITOR HERE*/} 
-                        
-                      </button>
-                      <button className="text-grey-500 hover:text-grey-700 flex items-center space-x-2" onClick={()=>{setTemplateDel(template.id)
-                      setPopUpOpen(true)}}>
-                     <i className="fas fa-trash-alt"></i>
-                      </button>
-                      <button className="text-grey-500 hover:text-grey-700 flex items-center space-x-2" onClick={()=>{setTemplateEdit(template.id)
-                      setEditPopUpOpen(true)}}>
-                     <i className="fas fa-sharp fa-light fa-pencil"></i>
-                      </button>
-                      </div>
-                    </td>
+            <div className="text-center p-4">
+              <p className="text-lg text-gray-500">No Templates Found</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="min-w-full table-auto bg-gray-800 text-white">
+                <thead>
+                  <tr>
+                    <th className="px-4 py-2 text-left">Title</th>
+                    <th className="px-4 py-2 text-left">Description</th>
+                    <th className="px-4 py-2 text-left">Owner</th>
+                    <th className="px-4 py-2 text-left">Last Modified</th>
+                    <th className="px-4 py-2 text-left">Tags</th>
+                    <th className="px-4 py-2 text-left">Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>)}
-
-          {isPopUpOpen && (
-  <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
-    <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-      <h3 className="text-lg font-semibold text-gray-700">Are you sure you want to delete this template?</h3>
-      <p className="text-sm text-gray-500">This action cannot be undone.</p>
-      <div className="flex justify-between mt-4">
-        <button
-          onClick={()=>{handleDeleteTemplate()}}
-          className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
-        >
-          Yes, Delete
-        </button>
-        <button
-          onClick={handleCancelDelete}
-          className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400"
-        >
-          Cancel
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-
-{isEditPopUpOpen && (
-    <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
-         <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-          <h2 className="text-2xl font-bold text-center mb-6">Edit Template</h2>
-          
-          {/* Form */}
-          <form action="#" method="POST" onSubmit={handleEditTemplate}>
-            {/* Title */}
-            <div className="mb-4">
-              <label htmlFor="title" className="block text-sm font-semibold text-gray-700">
-                New Title
-              </label>
-              <input
-                type="text"
-                id="title"
-                name="title"
-                value={formData.title}
-                onChange={fieldChange}
-                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                
-              />
+                </thead>
+                <tbody>
+                  {templates.map((template) => (
+                    <tr key={template.id} className="border-t border-gray-700">
+                      <td className="px-4 py-2">{template.title}</td>
+                      <td className="px-4 py-2">{template.explanation}</td>
+                      <td className="px-4 py-2">{template.user.userName}</td>
+                      <td className="px-4 py-2">{new Date(template.updatedAt).toLocaleDateString()}</td>
+                      
+                      {/* Display tags */}
+                      <td className="px-4 py-2">
+                        <div className="flex flex-wrap gap-2">
+                          {template.tags && template.tags.length > 0 ? (
+                            template.tags.map((tag:{name:string,id:number}) => (
+                              <span
+                                key={tag.id}
+                                className="bg-gray-600 text-gray-200 px-3 py-1 rounded-full text-sm"
+                              >
+                                {tag.name}
+                                <button
+                                  onClick={() => {setTagDel(true); handleTagRemove(template.id, tag.id)}}
+                                  className="ml-2 text-red-500 hover:text-red-700"
+                                >
+                                  <i className="fas fa-times"></i>
+                                </button>
+                              </span>
+                            ))
+                          ) : (
+                            <span className="text-gray-500">No Tags</span>
+                          )}
+                        </div>
+                      </td>
+      
+                      <td className="px-4 py-2 text-center">
+                        <div className="flex space-x-4">
+                          <button className="text-green-500 hover:text-green-700 flex items-center space-x-2">
+                            <i className="fas fa-play-circle"></i>
+                          </button>
+                          <button
+                            className="text-gray-500 hover:text-gray-700 flex items-center space-x-2"
+                            onClick={() => {setTemplateDel(template.id); setPopUpOpen(true)}}
+                          >
+                            <i className="fas fa-trash-alt"></i>
+                          </button>
+                          <button
+                            className="text-gray-500 hover:text-gray-700 flex items-center space-x-2"
+                            onClick={() => {setTemplateEdit(template.id); setEditPopUpOpen(true)}}
+                          >
+                            <i className="fas fa-pencil-alt"></i>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-  
-  
-            {/* Description */}
-            <div className="mb-6">
-              <label htmlFor="explanation" className="block text-sm font-semibold text-gray-700">
-                New Description
-              </label>
-              <input
-                type="text"
-                id="explanation"
-                name="explanation"
-                value={formData.explanation}
-                onChange={fieldChange}
-                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                
-              />
-            </div>
-  
-   {/* Tags */}
-   <div className="flex flex-col">
-        <label htmlFor="tags" className="text-sm font-semibold text-gray-700">Add Tags</label>
-        <Select
-          id="tags"
-          name="tags"
-          isMulti
-          options={editPageTags}
-          value={formData.tags}
-          onChange={handleTagSelectChange}
-          className="mt-1"
-          classNamePrefix="react-select"
-        />
-      </div>
-
-      <div className="flex justify-between mt-4">
-            <button
-      className="bg-blue-500 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-600 transition duration-200 disabled:bg-gray-300"
-      onClick={() => handleTagPageChangeEdit(tagPageEdit - 1)}
-      disabled={tagPageEdit === 1}
-    >
-      <i className="fas fa-chevron-left"></i> {/* Left arrow icon */}
-    </button>
-    <span className="text-gray-700">Page {tagPageEdit} of {totalTagPageEdit}</span>
-    
-    <button
-      className="bg-blue-500 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-600 transition duration-200 disabled:bg-gray-300"
-      onClick={() => handleTagPageChangeEdit(tagPageEdit + 1)}
-      disabled={tagPageEdit === totalTagPageEdit}
-    >
-      <i className="fas fa-chevron-right"></i> {/* Right arrow icon */}
-    </button>
-    </div>
-           
-            <button
-          type="submit"
-          className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
-        >
-          Done
-        </button>
-        <button
-          onClick={handleCancelEdit}
-          className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400"
-        >
-          Cancel
-        </button>
-            </form>
-        </div>
-        </div>
-)}
-         
-    
+          )}
+      
           {/* Pagination Controls */}
           <div className="flex justify-between items-center mt-4">
             <button
               onClick={() => handlePageChange(page - 1)}
               disabled={page === 1}
-              className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400 disabled:opacity-50"
+              className="bg-gray-600 text-gray-300 px-4 py-2 rounded-md hover:bg-gray-500 disabled:opacity-50"
             >
               Previous
             </button>
-    
-            <span className="text-gray-700">Page {page} of {totalPages}</span>
-    
+      
+            <span className="text-gray-300">Page {page} of {totalPages}</span>
+      
             <button
               onClick={() => handlePageChange(page + 1)}
               disabled={page === totalPages}
-              className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400 disabled:opacity-50"
+              className="bg-gray-600 text-gray-300 px-4 py-2 rounded-md hover:bg-gray-500 disabled:opacity-50"
             >
               Next
             </button>
           </div>
         </div>
+      
+        {/* Delete Confirmation Popup */}
+        {isPopUpOpen && (
+          <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
+            <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+              <h3 className="text-lg font-semibold text-gray-700">Are you sure you want to delete this template?</h3>
+              <p className="text-sm text-gray-500">This action cannot be undone.</p>
+              <div className="flex justify-between mt-4">
+                <button
+                  onClick={handleDeleteTemplate}
+                  className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
+                >
+                  Yes, Delete
+                </button>
+                <button
+                  onClick={handleCancelDelete}
+                  className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      
+        {/* Edit Template Popup */}
+        {isEditPopUpOpen && (
+          <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50 text-gray-800">
+            <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+              <h2 className="text-2xl font-bold text-center mb-6">Edit Template</h2>
+      
+              <form action="#" method="POST" onSubmit={handleEditTemplate}>
+                {/* Title */}
+                <div className="mb-4">
+                  <label htmlFor="title" className="block text-sm font-semibold text-gray-700">
+                    New Title
+                  </label>
+                  <input
+                    type="text"
+                    id="title"
+                    name="title"
+                    value={formData.title}
+                    onChange={fieldChange}
+                    className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+      
+                {/* Description */}
+                <div className="mb-6">
+                  <label htmlFor="explanation" className="block text-sm font-semibold text-gray-700">
+                    New Description
+                  </label>
+                  <input
+                    type="text"
+                    id="explanation"
+                    name="explanation"
+                    value={formData.explanation}
+                    onChange={fieldChange}
+                    className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+      
+                {/* Tags */}
+                <div className="flex flex-col">
+                  <label htmlFor="tags" className="text-sm font-semibold text-gray-700">Add Tags</label>
+                  <Select
+                    id="tags"
+                    name="tags"
+                    isMulti
+                    options={editPageTags}
+                    value={formData.tags}
+                    onChange={handleTagSelectChange}
+                    className="mt-1"
+                    classNamePrefix="react-select"
+                  />
+                </div>
+      
+                <div className="flex justify-between mt-4">
+                  <button
+                    className="bg-blue-500 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-600"
+                    onClick={() => handleTagPageChangeEdit(tagPageEdit - 1)}
+                    disabled={tagPageEdit === 1}
+                  >
+                    <i className="fas fa-chevron-left"></i>
+                  </button>
+                  <span className="text-gray-700">Page {tagPageEdit} of {totalTagPageEdit}</span>
+                  
+                  <button
+                    className="bg-blue-500 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-600"
+                    onClick={() => handleTagPageChangeEdit(tagPageEdit + 1)}
+                    disabled={tagPageEdit === totalTagPageEdit}
+                  >
+                    <i className="fas fa-chevron-right"></i>
+                  </button>
+                </div>
+      
+                <button
+                  type="submit"
+                  className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
+                >
+                  Done
+                </button>
+                <button
+                  onClick={handleCancelEdit}
+                  className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400"
+                >
+                  Cancel
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
+      </div>
       );
 }
