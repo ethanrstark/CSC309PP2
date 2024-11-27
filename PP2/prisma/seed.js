@@ -1,6 +1,316 @@
 import prisma from "../utils/db.js";
 import { hashPassword } from "../utils/auth.js";
 
+const commentContents = [
+    "This is a solid start, but have you considered adding more examples?",
+    "Great post, though I feel the conclusion could be expanded.",
+    "This was an eye-opener! Keep up the fantastic work.",
+    "Reading this was like a mini workout for my brain!",
+    "Some points are a bit unclear—could you clarify section X?",
+    "Do you have any data sources or references to share?",
+    "I liked this, but there’s room for improvement in the formatting.",
+    "Have you considered the opposite argument? It might add depth.",
+    "How does this apply in real-world scenarios?",
+    "Can you elaborate on how this fits into the bigger picture?",
+    "My experience was slightly different—here’s what I noticed...",
+    "Brilliantly written! I’m looking forward to more posts like this.",
+    "You explained this complex topic so clearly. Kudos!",
+    "I’ve shared this with my team—it’s that good!",
+    "I appreciate the level of detail you’ve provided here.",
+    "This should come with a ‘mind blown’ warning!",
+    "I struggled with this concept before, but this post helped a lot.",
+    "I used to think differently, but this changed my perspective.",
+    "Interesting perspective, but I have to disagree with point X.",
+    "I think there’s more to consider regarding [specific topic].",
+    "Do you have any plans to expand on this in future articles?",
+    "This post made my brain do a happy dance—thanks for that!",
+    "Thank you for taking the time to write this. Much appreciated!",
+    "This helped me more than I can express—thank you!",
+    "A big thanks for shedding light on this overlooked topic.",
+    "I’ve encountered similar challenges, and this was really helpful.",
+    "I recently implemented something like this, and it worked well!",
+    "Can you recommend further reading on this subject?",
+    "I’d love to see a follow-up post that dives deeper into this.",
+    "Could you explain how this approach differs from [another method]?",
+    "What inspired you to write about this topic?",
+    "This seems a bit one-sided. How about [alternative viewpoint]?",
+    "What about the downsides of this approach?",
+    "I see your point, but here’s why I think otherwise.",
+    "I’ve read this three times, and my brain finally clicked. Worth it!",
+    "If this was a class, I’d totally ace it now!",
+    "I think a case study would complement this nicely.",
+    "Have you thought about making a video version of this?",
+    "I can’t thank you enough for sharing your expertise.",
+    "You’ve saved me hours of research. Thanks!",
+  ];
+
+  const hiddenReasons = [
+    "Contains inappropriate language",
+    "Violates community guidelines",
+    "Spam or promotional content",
+    "Offensive or discriminatory remarks",
+    "Irrelevant to the discussion",
+    "Reported for harassment or bullying",
+    "Misinformation or false claims",
+    "Copyright infringement",
+    "Privacy violation (personal information)",
+    "Repeated content from another post",
+    "Too many downvotes from users",
+    "Explicit or graphic content",
+    "Impersonation or misleading identity",
+    "Hate speech or inciting violence",
+    "Scam or phishing attempt"
+  ];
+
+  const reasons = [
+    "Offensive content",
+    "Spam or promotional content",
+    "Misinformation or false claims",
+    "Inappropriate language",
+    "Irrelevant or off-topic content",
+    "Copyright infringement",
+    "Harassment or hate speech",
+    "Violent or graphic content",
+    "Personal information exposure",
+    "Misleading or clickbait title",
+  ];
+  
+async function seedComments() {
+  const totalUsers = 15;
+  const totalPosts = 30;
+
+  const comments = [];
+  let commentIdCounter = 1;
+  const postIds = new Map();
+
+  for (let postId = 1; postId <= totalPosts; postId++) {
+    postIds.set(postId, []);
+    for (let i = 1; i <= 5; i++) {
+      postIds.get(postId).push(commentIdCounter);
+      const authorId = Math.floor(Math.random() * totalUsers) + 1;
+      const content = commentContents[Math.floor(Math.random() * commentContents.length)];
+      const isReply = i > 1 && Math.random() < 0.65;
+      
+      let parentId = null;
+      if (isReply) {
+        const idArr = postIds.get(postId);
+        parentId = idArr[Math.floor(Math.random() * idArr.length)];
+      }
+
+      const isHidden = Math.random() < 0.1;
+      comments.push({
+        content,
+        authorId,
+        postId,
+        parentId,
+        isHidden: isHidden ? true : false,
+        hiddenReason: isHidden ? hiddenReasons[Math.floor(Math.random() * hiddenReasons.length)] : null,
+      });
+      commentIdCounter++;
+    }
+  }
+
+  for (const comment of comments) {
+    await prisma.comment.create({ data: comment });
+  }
+};
+
+async function seedCommentRatings() {
+    const totalUsers = 15;
+    const totalComments = 150;
+  
+    const ratings = [];
+    for (let userId = 1; userId <= totalUsers; userId++) {
+      for (let commentId = 1; commentId <= totalComments; commentId++) {
+        const shouldRate = Math.random() < 0.4;
+        if (shouldRate) {
+          const isUpvote = Math.random() < 0.7;
+          ratings.push({
+            isUpvote,
+            commentId,
+            userId,
+          });
+        }
+      }
+    }
+    await prisma.commentRating.createMany({
+      data: ratings,
+    });
+  };
+  
+  async function updateCommentVoteCounts() {
+    const upvotes = await prisma.commentRating.groupBy({
+      by: ['commentId'],
+      where: {
+        isUpvote: true, // Count only upvotes
+      },
+      _count: {
+        _all: true,
+      },
+    });
+  
+    upvotes.forEach(async (upvote) => {
+      await prisma.comment.update({
+          where: { id: upvote.commentId },
+          data: {
+              upvoteCount: upvote._count._all,
+          },
+      });
+    });
+    
+    const downvotes = await prisma.commentRating.groupBy({
+      by: ['commentId'],
+      where: {
+        isUpvote: false, // Count only downvotes
+      },
+      _count: {
+        _all: true,
+      },
+    });
+  
+    downvotes.forEach(async (downvote) => {
+      await prisma.comment.update({
+          where: { id: downvote.commentId },
+          data: {
+              downvoteCount: downvote._count._all,
+          },
+      });
+    });
+  };
+
+async function seedBlogRatings() {
+  const totalUsers = 15;
+  const totalPosts = 30;
+
+  // Generate ratings focusing on the first 20 blog posts
+  const ratings = [];
+  for (let userId = 1; userId <= totalUsers; userId++) {
+    for (let postId = 1; postId <= totalPosts; postId++) {
+      // Favor the first 20 blog posts with higher activity
+      const isHidden = postId > 20;
+      const shouldRate = isHidden ? Math.random() < 0.1 : Math.random() < 0.5; // 10% for hidden, 50% for visible
+      if (shouldRate) {
+        const isUpvote = Math.random() < (isHidden ? 0.4 : 0.7); // 40% upvotes for hidden, 70% for visible
+        ratings.push({
+          isUpvote,
+          postId,
+          userId,
+        });
+      }
+    }
+  }
+  await prisma.blogRating.createMany({
+    data: ratings,
+  });
+};
+
+async function updateBlogPostVoteCounts() {
+  const upvotes = await prisma.blogRating.groupBy({
+    by: ['postId'],
+    where: {
+      isUpvote: true, // Count only upvotes
+    },
+    _count: {
+      _all: true,
+    },
+  });
+
+  upvotes.forEach(async (upvote) => {
+    await prisma.blogPost.update({
+        where: { id: upvote.postId },
+        data: {
+            upvoteCount: upvote._count._all,
+        },
+    });
+  });
+  
+  const downvotes = await prisma.blogRating.groupBy({
+    by: ['postId'],
+    where: {
+      isUpvote: false, // Count only downvotes
+    },
+    _count: {
+      _all: true,
+    },
+  });
+
+  downvotes.forEach(async (downvote) => {
+    await prisma.blogPost.update({
+        where: { id: downvote.postId },
+        data: {
+            downvoteCount: downvote._count._all,
+        },
+    });
+  });
+  
+};
+
+async function seedBlogPostReports() {
+  const totalUsers = 15; 
+  const totalPosts = 30; 
+  
+  const reports = new Set(); // To avoid duplicates
+  
+  while (reports.size < 30) {
+    const userId = Math.floor(Math.random() * totalUsers) + 1;
+    const postId = Math.floor(Math.random() * totalPosts) + 1;
+
+    const reportKey = `${userId}-${postId}`; // Ensures uniqueness
+    if (!reports.has(reportKey)) {
+      reports.add(reportKey);
+    }
+  }
+
+  // Convert set of unique reports to an array of objects
+  const reportData = Array.from(reports).map((reportKey) => {
+    const [userId, postId] = reportKey.split("-").map(Number);
+    const reason = reasons[Math.floor(Math.random() * reasons.length)];
+    return {
+      userId,
+      postId,
+      reason,
+    };
+  });
+
+  // Seed the reports into the database
+  await prisma.report.createMany({
+    data: reportData,
+  });
+};
+
+async function seedCommentReports() {
+    const totalUsers = 15; 
+    const totalComments = 50; // There are actually 150 but I want to keep the number of reports low
+    
+    const reports = new Set(); // To avoid duplicates
+    
+    while (reports.size < 50) {
+      const userId = Math.floor(Math.random() * totalUsers) + 1;
+      const commentId = Math.floor(Math.random() * totalComments) + 1;
+  
+      const reportKey = `${userId}-${commentId}`; // Ensures uniqueness
+      if (!reports.has(reportKey)) {
+        reports.add(reportKey);
+      }
+    }
+  
+    // Convert set of unique reports to an array of objects
+    const reportData = Array.from(reports).map((reportKey) => {
+      const [userId, commentId] = reportKey.split("-").map(Number);
+      const reason = reasons[Math.floor(Math.random() * reasons.length)];
+      return {
+        userId,
+        commentId,
+        reason,
+      };
+    });
+  
+    // Seed the reports into the database
+    await prisma.report.createMany({
+      data: reportData,
+    });
+  };
+
 async function main() {
     // Seed an admin user
     await prisma.user.create({
@@ -210,12 +520,15 @@ async function main() {
                 language: "PYTHON",
             },
             {
-                title: "Web API Request",
+                title: "Simple Calculator in Swift",
                 userId: 7,
-                explanation: "Fetch API example",
-                code: 'fetch("https://api.example.com").then(res => res.json()).then(data => console.log(data));',
-                file_name: "api.js",
-                language: "JavaScript",
+                explanation: "A basic calculator to perform addition in Swift",
+                code: `import Foundation
+              let a = 5
+              let b = 10
+              print("Sum: \\(a + b)")`,
+                file_name: "calculator.swift",
+                language: "Swift",
             },
             {
                 title: "Factorial in Java",
@@ -226,20 +539,31 @@ async function main() {
                 language: "JAVA",
             },
             {
-                title: "Sorting Algorithm",
+                title: "Hello Ruby",
                 userId: 9,
-                explanation: "Bubble sort in C",
-                code: "#include<stdio.h>\nvoid sort(int arr[], int n) {\n  for (int i = 0; i < n-1; i++)\n    for (int j = 0; j < n-i-1; j++)\n      if (arr[j] > arr[j+1]) {\n        int temp = arr[j]; arr[j] = arr[j+1]; arr[j+1] = temp;\n      }\n}\n",
-                file_name: "sort.c",
-                language: "C",
+                explanation: "Basic Ruby hello world example",
+                code: 'puts "Hello, Ruby!"',
+                file_name: "hello.rb",
+                language: "Ruby",
             },
             {
-                title: "Merge Two Arrays",
+                title: "Fibonacci Sequence in Go",
                 userId: 10,
-                explanation: "Merge arrays in Python",
-                code: "arr1 = [1, 2, 3]\narr2 = [4, 5, 6]\nmerged = arr1 + arr2\nprint(merged)",
-                file_name: "merge.py",
-                language: "PYTHON",
+                explanation: "Generate Fibonacci sequence using Go",
+                code: `package main
+                import "fmt"
+                func fibonacci(n int) []int {
+                seq := []int{0, 1}
+                for len(seq) < n {
+                  seq = append(seq, seq[len(seq)-1]+seq[len(seq)-2])
+                }
+                return seq
+                }
+                func main() {
+                fmt.Println(fibonacci(10))
+                }`,
+                file_name: "fibonacci.go",
+                language: "Go",
             },
         ],
     });
@@ -248,7 +572,7 @@ async function main() {
 await prisma.codeTemplate.create({
     data: {
       title: "FizzBuzz in Python",
-      userId: 1,
+      userId: 15,
       explanation: "Print FizzBuzz for numbers 1 to 100",
       code: 'for i in range(1, 101):\n  if i % 15 == 0:\n    print("FizzBuzz")\n  elif i % 3 == 0:\n    print("Fizz")\n  elif i % 5 == 0:\n    print("Buzz")\n  else:\n    print(i)',
       file_name: "fizzbuzz.py",
@@ -260,7 +584,7 @@ await prisma.codeTemplate.create({
   await prisma.codeTemplate.create({
     data: {
       title: "QuickSort in C++",
-      userId: 2,
+      userId: 14,
       explanation: "QuickSort algorithm implementation",
       code: "#include <iostream>\nvoid quickSort(int[], int, int);\nint main() { /*...*/ }",
       file_name: "quicksort.cpp",
@@ -272,7 +596,7 @@ await prisma.codeTemplate.create({
   await prisma.codeTemplate.create({
     data: {
       title: "Factorial in JavaScript",
-      userId: 3,
+      userId: 12,
       explanation: "Recursive factorial function",
       code: "function factorial(n) {\n  return n === 0 ? 1 : n * factorial(n - 1);\n}",
       file_name: "factorial.js",
@@ -283,12 +607,18 @@ await prisma.codeTemplate.create({
   
   await prisma.codeTemplate.create({
     data: {
-      title: "REST API in Python",
-      userId: 4,
-      explanation: "Basic Flask REST API",
-      code: 'from flask import Flask\napp = Flask(__name__)\n@app.route("/")\ndef hello():\n  return "Hello, World!"',
-      file_name: "api.py",
-      language: "PYTHON",
+      title: "Palindrome Checker in Rust",
+      userId: 13,
+      explanation: "Checks if a string is a palindrome using Rust",
+      code: `fn is_palindrome(s: &str) -> bool {
+    let reversed: String = s.chars().rev().collect();
+    s == reversed
+  }
+  fn main() {
+    println!("Is 'racecar' a palindrome? {}", is_palindrome("racecar"));
+  }`,
+      file_name: "palindrome.rs",
+      language: "Rust",
       tags: { connect: [{ id: 6 }] },
     },
   });
@@ -296,7 +626,7 @@ await prisma.codeTemplate.create({
   await prisma.codeTemplate.create({
     data: {
       title: "Binary Search Tree in Java",
-      userId: 5,
+      userId: 11,
       explanation: "Implementation of BST",
       code: "class Node { int key; Node left, right; }\nclass BST { /*...*/ }",
       file_name: "bst.java",
@@ -414,27 +744,22 @@ await prisma.codeTemplate.create({
   
   await prisma.codeTemplate.create({
     data: {
-      title: "Sorting Algorithm (Forked)",
+      title: "Ruby Array Manipulation",
       userId: 1,
-      explanation: "Bubble sort in Python",
-      code: `def bubble_sort(arr):
-        n = len(arr)
-        for i in range(n):
-          for j in range(0, n-i-1):
-            if arr[j] > arr[j+1]:
-              arr[j], arr[j+1] = arr[j+1], arr[j]`,
-      file_name: "sort.py",
-      language: "PYTHON",
+      explanation: "Basic array operations in Ruby",
+      code: 'arr = [1, 2, 3, 4]\narr.push(5)\nputs arr.inspect',
+      file_name: "array.rb",
+      language: "RUBY",
       isFork: true,
       originalId: 9,
     },
   });
-  
+
   // Seed forked templates (with tags)
   await prisma.codeTemplate.create({
     data: {
       title: "Scriptorium (forked)",
-      userId: 1,
+      userId: 11,
       explanation: "CSC309 PP1 (forked)",
       code: `console.log("Hello Whole Wide World");`,
       file_name: "index.js",
@@ -449,21 +774,14 @@ await prisma.codeTemplate.create({
   
   await prisma.codeTemplate.create({
     data: {
-      title: "FizzBuzz in Python (Forked)",
-      userId: 3,
-      explanation: "Enhanced FizzBuzz with customizable range",
-      code: `def fizzbuzz(start, end):
-        for i in range(start, end+1):
-          if i % 15 == 0:
-            print("FizzBuzz")
-          elif i % 3 == 0:
-            print("Fizz")
-          elif i % 5 == 0:
-            print("Buzz")
-          else:
-            print(i)`,
-      file_name: "fizzbuzz_forked.py",
-      language: "PYTHON",
+      title: "ToDo List in TypeScript",
+      userId: 13,
+      explanation: "Basic TypeScript example managing a ToDo list",
+      code: `let todos: string[] = ["Learn Prisma", "Build API"];
+      todos.push("Test Application");
+      console.log(todos);`,
+      file_name: "todo_list.ts",
+      language: "TypeScript",
       isFork: true,
       originalId: 1,
       tags: { connect: [{ id: 11 }] },
@@ -473,7 +791,7 @@ await prisma.codeTemplate.create({
   await prisma.codeTemplate.create({
     data: {
       title: "QuickSort in C++ (Forked)",
-      userId: 5,
+      userId: 15,
       explanation: "QuickSort with optimized pivot selection",
       code: `#include <iostream>
       void quickSort(int[], int, int);
@@ -481,7 +799,7 @@ await prisma.codeTemplate.create({
       file_name: "quicksort_optimized.cpp",
       language: "CPP",
       isFork: true,
-      originalId: 2,
+      originalId: 23,
       tags: { connect: [{ id: 7 }, { id: 14 }] },
     },
   });
@@ -489,7 +807,7 @@ await prisma.codeTemplate.create({
   await prisma.codeTemplate.create({
     data: {
         title: "FizzBuzz in Python (Forked)",
-        userId: 3,
+        userId: 14,
         explanation: "Enhanced FizzBuzz with customizable range",
         code: `def fizzbuzz(start, end):
   for i in range(start, end+1):
@@ -511,8 +829,8 @@ await prisma.codeTemplate.create({
 
 await prisma.codeTemplate.create({
     data: {
-        title: "QuickSort in C++ (Forked)",
-        userId: 5,
+        title: "QuickSort in C++ (Forked Again)",
+        userId: 12,
         explanation: "QuickSort with optimized pivot selection",
         code: `#include <iostream>
 void quickSort(int[], int, int);
@@ -520,7 +838,7 @@ int main() { /* Enhanced logic here */ }`,
         file_name: "quicksort_optimized.cpp",
         language: "CPP",
         isFork: true,
-        originalId: 2,
+        originalId: 23,
         tags: { connect: [{ id: 2 }, { id: 7 }, { id: 12 }, { id: 10 }, { id: 20 }] },
     },
 });
@@ -594,19 +912,19 @@ await prisma.codeTemplate.create({
         file_name: "iterative_mergesort.java",
         language: "JAVA",
         isFork: true,
-        originalId: 9,
+        originalId: 32,
         tags: { connect: [{ id: 2 }, { id: 9 }, { id: 16 }] },
     },
 });
 
 await prisma.codeTemplate.create({
     data: {
-        title: "Prime Checker (Forked)",
-        userId: 7,
-        explanation: "Prime checker optimized for larger numbers",
-        code: 'def is_prime(n):\n  if n <= 1: return False\n  if n <= 3: return True\n  if n % 2 == 0 or n % 3 == 0: return False\n  i = 5\n  while i * i <= n:\n    if n % i == 0 or n % (i + 2) == 0:\n      return False\n    i += 6\n  return True',
-        file_name: "prime_optimized.py",
-        language: "PYTHON",
+        title: "Swift Prime Number Checker (Forked)",
+        userId: 8,
+        explanation: "Check for prime numbers in Swift",
+        code: 'func isPrime(_ number: Int) -> Bool {\n  if number < 2 { return false }\n  for i in 2..<number {\n    if number % i == 0 { return false }\n  }\n  return true\n}\nprint(isPrime(7))',
+        file_name: "prime_checker.swift",
+        language: "Swift",
         isFork: true,
         originalId: 7,
         tags: { connect: [{ id: 7 }] },
@@ -615,12 +933,23 @@ await prisma.codeTemplate.create({
 
 await prisma.codeTemplate.create({
     data: {
-        title: "File Reader in C++ (Forked)",
+        title: "HTTP Server in Go",
         userId: 5,
-        explanation: "Enhanced file reader with error handling",
-        code: '#include <fstream>\n#include <iostream>\nint main() {\n  std::ifstream file("example.txt");\n  if (!file) {\n    std::cerr << "Error opening file";\n  }\n}',
-        file_name: "filereader_error.cpp",
-        language: "CPP",
+        explanation: "Simple HTTP server using Go's net/http package",
+        code: `package main
+        import (
+        "fmt"
+        "net/http"
+        )
+        func handler(w http.ResponseWriter, r *http.Request) {
+        fmt.Fprintf(w, "Hello, World!")
+        }
+        func main() {
+        http.HandleFunc("/", handler)
+        http.ListenAndServe(":8080", nil)
+        }`,
+        file_name: "http_server.go",
+        language: "Go",
         isFork: true,
         originalId: 10,
         tags: { connect: [{ id: 6 }] },
@@ -630,7 +959,7 @@ await prisma.codeTemplate.create({
 await prisma.codeTemplate.create({
     data: {
         title: "CRUD Operations (Forked)",
-        userId: 4,
+        userId: 14,
         explanation: "CRUD with logging",
         code: 'let db = [];\nfunction create(item) { db.push(item); console.log("Created:", item); }\nfunction read() { return db; }',
         file_name: "crud_logging.js",
@@ -644,7 +973,7 @@ await prisma.codeTemplate.create({
 await prisma.codeTemplate.create({
     data: {
         title: "Web Scraper in Python (Forked)",
-        userId: 2,
+        userId: 12,
         explanation: "Scrape with pagination support",
         code: 'import requests\nfrom bs4 import BeautifulSoup\ndef scrape_pages(urls):\n  for url in urls:\n    resp = requests.get(url)\n    soup = BeautifulSoup(resp.text, "html.parser")\n    print(soup.title)',
         file_name: "scraper_pages.py",
@@ -657,12 +986,17 @@ await prisma.codeTemplate.create({
 
 await prisma.codeTemplate.create({
     data: {
-        title: "Web Scraper in Python 2 (Forked)",
-        userId: 14,
-        explanation: "Web scraping copy",
-        code: 'import requests\nfrom bs4 import BeautifulSoup\ndef scrape_pages(urls):\n  for url in urls:\n    resp = requests.get(url)\n    soup = BeautifulSoup(resp.text, "html.parser")\n    print(soup.title)',
-        file_name: "scraper.py",
-        language: "PYTHON",
+        title: "Factorial in Rust",
+        userId: 15,
+        explanation: "Calculates factorial of a number using recursion in Rust",
+        code: `fn factorial(n: u32) -> u32 {
+        if n == 0 { 1 } else { n * factorial(n - 1) }
+      }
+      fn main() {
+        println!("Factorial of 5 is: {}", factorial(5));
+      }`,
+        file_name: "factorial.rs",
+        language: "Rust",
         isFork: true,
         originalId: 12,
         tags: { connect: [{ id: 4 }, { id: 12 }, { id: 19 }, { id: 10 }] },
@@ -671,18 +1005,107 @@ await prisma.codeTemplate.create({
 
 await prisma.codeTemplate.create({
     data: {
-        title: "Startup Code (Forked)",
+        title: "TypeScript Interface Example",
         userId: 1,
-        explanation: "Enhanced AI startup with parallel processing",
-        code: '#include <pthread.h>\nint main() {\n  // Threaded logic\n}',
-        file_name: "ai_threads.c",
-        language: "C",
+        explanation: "Demonstrates usage of interfaces in TypeScript",
+        code: `interface User {
+id: number;
+name: string;
+}
+const user: User = { id: 1, name: "Ethan" };
+console.log(user);`,
+        file_name: "interface_example.ts",
+        language: "TypeScript",
         isFork: true,
-        originalId: 2,
+        originalId: 26,
         tags: { connect: [{ id: 8 }, { id: 14 }, { id: 17 }, { id: 7 }] },
     },
 });
 
+await prisma.codeTemplate.createMany({
+    data: [
+        {
+            title: "File Reading in Ruby",
+            userId: 11,
+            explanation: "Read and print file contents in Ruby",
+            code: `File.open("example.txt").each { |line| puts line }`,
+            file_name: "read_file.rb",
+            language: "Ruby",
+        },
+        {
+            title: "Dictionary in Swift",
+            userId: 9,
+            explanation: "Demonstrates creating and accessing a dictionary in Swift",
+            code: `var capitals: [String: String] = ["Canada": "Ottawa", "Japan": "Tokyo"]
+        print(capitals["Canada"] ?? "Unknown")`,
+            file_name: "dictionary.swift",
+            language: "Swift",
+        },
+        {
+            title: "Factorial Calculation in Go",
+            userId: 2,
+            explanation: "Recursive function to calculate the factorial of a number",
+            code: `package main
+        import "fmt"
+        func factorial(n int) int {
+        if n == 0 {
+        return 1
+        }
+        return n * factorial(n-1)
+        }
+        func main() {
+        number := 5
+        fmt.Printf("Factorial of %d is %d\\n", number, factorial(number))
+        }`,
+            file_name: "factorial.go",
+            language: "Go",
+        },
+        {
+            title: "Matrix Multiplication in Rust",
+            userId: 8,
+            explanation: "Performs matrix multiplication on two 2x2 matrices",
+            code: `fn multiply_matrices(a: [[i32; 2]; 2], b: [[i32; 2]; 2]) -> [[i32; 2]; 2] {
+        let mut result = [[0; 2]; 2];
+        for i in 0..2 {
+        for j in 0..2 {
+            for k in 0..2 {
+            result[i][j] += a[i][k] * b[k][j];
+            }
+        }
+        }
+        result
+        }
+        fn main() {
+        let a = [[1, 2], [3, 4]];
+        let b = [[5, 6], [7, 8]];
+        let result = multiply_matrices(a, b);
+        println!("Resulting matrix: {:?}", result);
+        }`,
+            file_name: "matrix_multiplication.rs",
+            language: "Rust",
+        },
+        {
+            title: "Array Sorting in TypeScript",
+            userId: 7,
+            explanation: "Sorts an array of numbers using the bubble sort algorithm",
+            code: `const bubbleSort = (arr: number[]): number[] => {
+        let n = arr.length;
+        for (let i = 0; i < n - 1; i++) {
+        for (let j = 0; j < n - i - 1; j++) {
+            if (arr[j] > arr[j + 1]) {
+            [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
+            }
+        }
+        }
+        return arr;
+        };
+        const numbers = [64, 34, 25, 12, 22, 11, 90];
+        console.log("Sorted Array:", bubbleSort(numbers));`,
+            file_name: "bubble_sort.ts",
+            language: "TypeScript",
+        },
+]});
+    
     // Seed blog posts
     await prisma.blogPost.create({
         data: {
@@ -1019,84 +1442,16 @@ await prisma.codeTemplate.create({
         }
     });
 
-    // TODO finish seeding comments and reports and ratings
-
-    // Seed 2 comments and connect it to a user and blog post
-    await prisma.comment.createMany({
-        data: [
-            {
-                content: "I agree",
-                authorId: 1,
-                postId: 1,
-            },
-            {
-                content: "Me too",
-                authorId: 2,
-                postId: 1,
-            },
-        ],
-    });
-
-    // Seed a few replies to the first comment
-    await prisma.comment.createMany({
-        data: [
-            {
-                content: "edit: nvm",
-                authorId: 1,
-                parentId: 1,
-                postId: 1,
-            },
-            {
-                content: "You gots to be right",
-                authorId: 2,
-                parentId: 1,
-                postId: 1,
-            },
-        ],
-    });
-
-    //now reports
-    await prisma.report.createMany({
-        data: [
-            {
-                //set 1 report for comment 1
-                reason: "Innapropriate content",
-                commentId: 1,
-                userId: 1,
-            },
-            {
-                //set 2 reports for post 1
-                reason: "Harmful content",
-                postId: 1,
-                userId: 1,
-            },
-            {
-                reason: "Harmful content",
-                postId: 1,
-                userId: 2,
-            },
-            //set 2 reports for comment 2
-            {
-                reason: "Innapropriate content",
-                commentId: 2,
-                userId: 1,
-            },
-            {
-                reason: "Innapropriate content",
-                commentId: 2,
-                userId: 2,
-            },
-            //set 1 report for post 2
-            {
-                reason: "Harmful content",
-                postId: 2,
-                userId: 1,
-            },
-        ],
-    });
+    await seedBlogRatings();
+    await updateBlogPostVoteCounts();
+    await seedComments();
+    await seedCommentRatings();
+    await updateCommentVoteCounts();
+    await seedBlogPostReports();
+    await seedCommentReports();
 
     console.log("Database has been seeded successfully!");
-}
+};
 
 main()
     .then(async () => {
