@@ -20,6 +20,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const token = req.headers.authorization;
     const user: UserPayload | null = token ? (verifyAccessToken(token) as unknown as UserPayload) : null;
 
+    if (!req.query.blogPostId) {
+        return res.status(400).json({ error: "Missing blogPostId parameter" });
+    }
+
+    const blogPostId = parseInt(req.query.blogPostId as string);
     const {
         page = "1",
         limit = `${COMMENT_LIMIT}`,
@@ -72,13 +77,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 ? -1
                 : await prisma.comment.count({
                       where: {
-                          AND: [{ OR: hiddenCheck }, { parentId: processedParentId }],
+                          AND: [{ postId: blogPostId}, { OR: hiddenCheck }, { parentId: processedParentId }],
                       },
                   });
 
         const comments = await prisma.comment.findMany({
             where: {
-                AND: [{ OR: hiddenCheck }, { parentId: processedParentId }],
+                AND: [{ postId: blogPostId}, { OR: hiddenCheck }, { parentId: processedParentId }],
             },
             include: {
                 author: {
