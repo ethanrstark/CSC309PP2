@@ -23,8 +23,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         const template = await prisma.codeTemplate.findUnique({
             where: { id },
-            select: {
-                blogPosts: true,
+            include: {
+                blogPosts: {include:{author:true}},
+                user:true,
+                tags:true
             },
         });
 

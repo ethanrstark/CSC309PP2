@@ -170,84 +170,100 @@ const handleTagPageChange = (newPage:number)=>{
 }
   return (
    
-    <div className="container mx-auto px-4 py-6"> <link
-  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
-  rel="stylesheet"
-/>
-      <div className="flex mb-4">
-        {/* Search Bar Section */}
-        <div className="flex flex-col w-full md:w-1/3 mr-4">
-          <label htmlFor="titleSearch" className="text-sm font-semibold text-gray-700">
-            Search by Title:
-          </label>
-          <input
-            id="titleSearch"
-            type="text"
-            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md"
-            value={titleFilter}
-            onChange={(e) => setTitleFilter(e.target.value)}
-            placeholder="Search by title"
-          />
-        </div>
-
-        <div className="flex flex-col w-full md:w-1/3 mr-4">
-          <label htmlFor="descriptionSearch" className="text-sm font-semibold text-gray-700">
-            Search by Description:
-          </label>
-          <input
-            id="descriptionSearch"
-            type="text"
-            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md"
-            value={descriptionFilter}
-            onChange={(e) => setDescriptionFilter(e.target.value)}
-            placeholder="Search by description"
-          />
-        </div>
-
-        <div className="flex flex-col w-full md:w-1/3">
-          <label htmlFor="tagsSearch" className="text-sm font-semibold text-gray-700">
-            Filter by Tags:
-          </label>
-          <Select
-            isMulti
-            value={selectedTags}
-            onChange={handleTagChange}
-            options={tags}
-            className="mt-1"
-            classNamePrefix="react-select"
-            placeholder="Select or create tags"
-            components={{ SingleValue: customSingleValue }}
-          />
-         <div className="flex justify-between mt-4">
-        <button
-  className="bg-blue-500 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-600 transition duration-200 disabled:bg-gray-300"
-  onClick={() => handleTagPageChange(tagPage - 1)}
-  disabled={tagPage === 1}
->
-  <i className="fas fa-chevron-left"></i> {/* Left arrow icon */}
-</button>
-<span className="text-gray-700">Page {tagPage} of {totalTagPage}</span>
-
-<button
-  className="bg-blue-500 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-600 transition duration-200 disabled:bg-gray-300"
-  onClick={() => handleTagPageChange(tagPage + 1)}
-  disabled={tagPage === totalTagPage}
->
-  <i className="fas fa-chevron-right"></i> {/* Right arrow icon */}
-</button>
-</div>
-</div>
+    <div className="min-h-screen bg-gray-900 text-white">
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+      rel="stylesheet"
+    />
+    {/* Search Bar Section */}
+    <div className="container mx-auto px-4 py-6 flex flex-wrap mb-4">
+      {/* Search by Title */}
+      <div className="flex flex-col w-full md:w-1/3 mr-4 mb-4 md:mb-0">
+        <label htmlFor="titleSearch" className="text-sm font-semibold text-gray-300">
+          Search by Title:
+        </label>
+        <input
+          id="titleSearch"
+          type="text"
+          className="mt-1 block w-full px-4 py-2 border border-gray-700 bg-gray-800 text-white rounded-md"
+          value={titleFilter}
+          onChange={(e) => setTitleFilter(e.target.value)}
+          placeholder="Search by title"
+        />
       </div>
-
-      {/* Template Table */}
-      {noTemplates ? (
-  <div className="text-center p-4">
-    <p className="text-lg text-gray-500">No Templates Found</p>
-  </div>
-      ):( <div className="overflow-x-auto">
-        <table className="min-w-full table-auto">
+  
+      {/* Search by Description */}
+      <div className="flex flex-col w-full md:w-1/3 mr-4 mb-4 md:mb-0">
+        <label htmlFor="descriptionSearch" className="text-sm font-semibold text-gray-300">
+          Search by Description:
+        </label>
+        <input
+          id="descriptionSearch"
+          type="text"
+          className="mt-1 block w-full px-4 py-2 border border-gray-700 bg-gray-800 text-white rounded-md"
+          value={descriptionFilter}
+          onChange={(e) => setDescriptionFilter(e.target.value)}
+          placeholder="Search by description"
+        />
+      </div>
+  
+      {/* Filter by Tags */}
+      <div className="flex flex-col w-full md:w-1/3">
+              <label htmlFor="tagsSearch" className="text-sm font-semibold text-gray-300">
+                Filter by Tags:
+              </label>
+              <Select
+                isMulti
+                value={selectedTags}
+                onChange={handleTagChange}
+                options={tags}
+                className="mt-1"
+                classNamePrefix="react-select"
+                placeholder="Select tags"
+                components={{ SingleValue: customSingleValue }}
+                styles={{
+                  control: (provided) => ({
+                    ...provided,
+                    backgroundColor: '#2D3748', // Dark background for the select input
+                    borderColor: '#4A5568', // Dark border for the select input
+                  }),
+                  option: (provided) => ({
+                    ...provided,
+                    backgroundColor: '#4A5568', // Dark background for options
+                    color: '#E2E8F0', // Light color for option text
+                  }),
+                }}
+              />
+        <div className="flex justify-between mt-4">
+          <button
+            className="bg-blue-500 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-600 transition duration-200 disabled:bg-gray-300"
+            onClick={() => handleTagPageChange(tagPage - 1)}
+            disabled={tagPage === 1}
+          >
+            <i className="fas fa-chevron-left"></i> {/* Left arrow icon */}
+          </button>
+          <span className="text-gray-300">Page {tagPage} of {totalTagPage}</span>
+          <button
+            className="bg-blue-500 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-600 transition duration-200 disabled:bg-gray-300"
+            onClick={() => handleTagPageChange(tagPage + 1)}
+            disabled={tagPage === totalTagPage}
+          >
+            <i className="fas fa-chevron-right"></i> {/* Right arrow icon */}
+          </button>
+        </div>
+      </div>
+    </div>
+  
+    {/* Template Table */}
+    {noTemplates ? (
+      <div className="text-center p-4">
+        <p className="text-lg text-gray-500">No Templates Found</p>
+      </div>
+    ) : (
+      <div className="overflow-x-auto">
+        <table className="min-w-full table-auto bg-gray-800 text-white">
           <thead>
-            <tr>
+            <tr className="border-b border-gray-700">
               <th className="px-4 py-2 text-left">Title</th>
               <th className="px-4 py-2 text-left">Description</th>
               <th className="px-4 py-2 text-left">Owner</th>
@@ -257,60 +273,61 @@ const handleTagPageChange = (newPage:number)=>{
             </tr>
           </thead>
           <tbody>
-            {(templates ||[]).map((template) => (
-              <tr key={template.id} className="border-t">
+            {(templates || []).map((template) => (
+              <tr key={template.id} className="border-t border-gray-700">
                 <td className="px-4 py-2">{template.title}</td>
                 <td className="px-4 py-2">{template.explanation}</td>
                 <td className="px-4 py-2">{template.user.userName}</td>
                 <td className="px-4 py-2">{new Date(template.updatedAt).toLocaleDateString()}</td>
-                
-                                      {/* Display tags */}
-      <div className="flex flex-wrap gap-2">
-        {template.tags && template.tags.length > 0 ? (
-          template.tags.map((tag:{name:string,id:number}) => (
-            <span
-              key={tag.id}
-              className="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm"
-            >
-              {tag.name}
-              
-            </span>
-          ))
-        ) : (
-          <span className="text-gray-500">No Tags</span>
-        )}
-      </div><td className="px-4 py-2 text-center">
+                <td className="px-4 py-2">
+                  {/* Display tags */}
+                  <div className="flex flex-wrap gap-2">
+                    {template.tags && template.tags.length > 0 ? (
+                      template.tags.map((tag: { name: string; id: number }) => (
+                        <span
+                          key={tag.id}
+                          className="bg-gray-600 text-gray-100 px-3 py-1 rounded-full text-sm"
+                        >
+                          {tag.name}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="text-gray-500">No Tags</span>
+                    )}
+                  </div>
+                </td>
+                <td className="px-4 py-2 text-center">
                   <button className="text-green-500 hover:text-green-700">
-                    <i className="fas fa-play-circle"></i> {/* Use the play icon */}
+                    <i className="fas fa-play-circle"></i> {/* Play icon */}
                   </button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
-      </div>)}
-     
-
-      {/* Pagination Controls */}
-      <div className="flex justify-between items-center mt-4">
-        <button
-          onClick={() => handlePageChange(page - 1)}
-          disabled={page === 1}
-          className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400 disabled:opacity-50"
-        >
-          Previous
-        </button>
-
-        <span className="text-gray-700">Page {page} of {totalPages}</span>
-
-        <button
-          onClick={() => handlePageChange(page + 1)}
-          disabled={page === totalPages}
-          className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400 disabled:opacity-50"
-        >
-          Next
-        </button>
       </div>
+    )}
+  
+    {/* Pagination Controls */}
+    <div className="flex justify-between items-center mt-4">
+      <button
+        onClick={() => handlePageChange(page - 1)}
+        disabled={page === 1}
+        className="bg-gray-600 text-gray-300 px-4 py-2 rounded-md hover:bg-gray-500 disabled:opacity-50"
+      >
+        Previous
+      </button>
+  
+      <span className="text-gray-300">Page {page} of {totalPages}</span>
+  
+      <button
+        onClick={() => handlePageChange(page + 1)}
+        disabled={page === totalPages}
+        className="bg-gray-600 text-gray-300 px-4 py-2 rounded-md hover:bg-gray-500 disabled:opacity-50"
+      >
+        Next
+      </button>
     </div>
+  </div>
   );
 }
