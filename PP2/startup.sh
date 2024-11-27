@@ -47,3 +47,43 @@ check_compiler gcc
 # Check for C++
 check_compiler g++
 
+
+
+# Build Python Docker image
+docker build -t my-python-image -f Dockerfile.python .
+
+# Build JavaScript Docker image
+docker build -t my-javascript-image -f Dockerfile.javascript .
+
+
+# Build Ruby Docker image
+docker build -t my-ruby-image -f Dockerfile.ruby .
+
+#Build C docker image
+docker build -t my-c-image -f Dockerfile.c .
+
+#build C++ docker image
+
+docker build -t my-cpp-image -f Dockerfile.cpp .
+
+#build java image
+
+docker build -t my-java-image -f Dockerfile.java .
+
+#build rust image
+
+docker build -t my-rust-image -f Dockerfile.rust .
+
+#build go image
+
+docker build -t my-go-image -f Dockerfile.go .
+
+#build php image
+
+docker build -t my-php-image -f Dockerfile.php .
+
+#build swift image
+
+docker build -t my-swift-image -f Dockerfile.swift .
+
+

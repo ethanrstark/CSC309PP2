@@ -56,7 +56,7 @@ const LoginPage: React.FC<FormProps>=()=>{
         <div className="min-h-screen bg-gray-100 flex justify-center items-center p-6">
         {/* Login Panel */}
         <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-          <h2 className="text-2xl font-bold text-center mb-6">Login</h2>
+          <h2 className="text-2xl font-bold text-center mb-6 text-black">Login</h2>
           
           {/* Form */}
           <form action="#" method="POST" onSubmit={handleSubmit}>
@@ -71,7 +71,7 @@ const LoginPage: React.FC<FormProps>=()=>{
                 name="username"
                 value={formData.username}
                 onChange={fieldChange}
-                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
                 required
               />
             </div>
@@ -88,7 +88,7 @@ const LoginPage: React.FC<FormProps>=()=>{
                 name="password"
                 value={formData.password}
                 onChange={fieldChange}
-                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
                 required
               />
             </div>
@@ -101,7 +101,8 @@ const LoginPage: React.FC<FormProps>=()=>{
             >
               Login
             </button>
-            <p> Don't have an account? </p> <Link href="/signup"> Sign Up</Link>
+            <p className="text-black"> Don't have an account? </p> 
+            <Link href="/signup" className="text-black"> Sign Up</Link>
             
             {error && <p className="text-red-500 mt-4">{error}</p>}
           </form>

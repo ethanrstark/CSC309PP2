@@ -1,0 +1,6 @@
+# Dockerfile.rust
+FROM rust:1.56-slim
+
+WORKDIR /app
+
+CMD ["cargo", "run"]
