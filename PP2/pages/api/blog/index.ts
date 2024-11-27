@@ -25,6 +25,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         sortBy = "upvoteCount",
         sortOrder = "desc",
         countPosts = "false",
+        userId = "0",
     } = req.query as Record<string, string>;
 
     const pageNum = parseInt(page as string, 10);
@@ -42,6 +43,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(400).json({ error: "Invalid countPosts query parameter" });
     }
 
+    if (userId !== "0" && await prisma.user.findUnique({ where: { id: parseInt(userId) } }) == null) {
+        return res.status(404).json({ error: "User not found" });
+    }
+
     const sortOptions: SortOptionType[] = [
         { [sortBy as string]: sortOrder as "asc" | "desc" }, // Primary sorting criterion
         { id: "asc" }, // Secondary unique sort by id to guarantee stable sorting
@@ -53,38 +58,70 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     try {
-        // Get the total number of posts if requested (else set to -1)
-        const postCount =
-            countPosts === "true"
+        let postCount;
+        let blogPosts;
+        if (userId == "0") {
+            // Get the total number of posts if requested (else set to -1)
+            postCount = countPosts === "true"
                 ? await prisma.blogPost.count({ where: { OR: hiddenCheck } })
                 : -1;
 
-        const blogPosts = await prisma.blogPost.findMany({
-            where: {
-                OR: hiddenCheck, // Retrieve blog posts that are either not hidden or authored by the user
-            },
-            include: {
-                author: {
-                    select: {
-                        id: true,
-                        userName: true,
-                        avatar: true,
-                        role: true,
+            blogPosts = await prisma.blogPost.findMany({
+                where: {
+                    OR: hiddenCheck, // Retrieve blog posts that are either not hidden or authored by the user
+                },
+                include: {
+                    author: {
+                        select: {
+                            id: true,
+                            userName: true,
+                            avatar: true,
+                            role: true,
+                        },
+                    },
+                    tags: true,
+                    templates: {
+                        select: {
+                            id: true,
+                            title: true,
+                        },
                     },
                 },
-                tags: true,
-                templates: {
-                    select: {
-                        id: true,
-                        title: true,
-                    },
-                },
-            },
-            take: pageLimit,
-            skip: (pageNum - 1) * pageLimit,
-            orderBy: sortOptions,
-        });
+                take: pageLimit,
+                skip: (pageNum - 1) * pageLimit,
+                orderBy: sortOptions,
+            });
+        } else {
+            // Get the total number of posts that user with userId authored if requested (else set to -1)
+            postCount = countPosts === "true"
+                ? await prisma.blogPost.count({ where: { authorId: parseInt(userId) } })
+                : -1;
 
+            // Retrieve blog posts that user with userId has authored
+            blogPosts = await prisma.blogPost.findMany({
+                where: { authorId: parseInt(userId) },
+                include: {
+                    author: {
+                        select: {
+                            id: true,
+                            userName: true,
+                            avatar: true,
+                            role: true,
+                        },
+                    },
+                    tags: true,
+                    templates: {
+                        select: {
+                            id: true,
+                            title: true,
+                        },
+                    },
+                },
+                take: pageLimit,
+                skip: (pageNum - 1) * pageLimit,
+                orderBy: sortOptions,
+            });
+        }
         res.status(200).json({
             blogPosts,
             postCount,

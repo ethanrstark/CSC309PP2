@@ -53,61 +53,65 @@ const LoginPage: React.FC<FormProps>=()=>{
       }
 
     return (
-        <div className="min-h-screen bg-gray-100 flex justify-center items-center p-6">
-        {/* Login Panel */}
-        <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-          <h2 className="text-2xl font-bold text-center mb-6 text-black">Login</h2>
+      <div className="min-h-screen bg-gray-900 flex justify-center items-center p-6">
+      {/* Login Panel */}
+      <div className="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md">
+        <h2 className="text-2xl font-bold text-center mb-6 text-white">Login</h2>
+        
+        {/* Form */}
+        <form action="#" method="POST" onSubmit={handleSubmit}>
+          {/* Username */}
+          <div className="mb-4">
+            <label htmlFor="username" className="block text-sm font-semibold text-gray-300">
+              Username
+            </label>
+            <input
+              type="text"
+              id="username"
+              name="username"
+              value={formData.username}
+              onChange={fieldChange}
+              className="mt-1 block w-full px-4 py-2 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-white bg-gray-700"
+              required
+            />
+          </div>
+    
+          {/* Password */}
+          <div className="mb-6">
+            <label htmlFor="password" className="block text-sm font-semibold text-gray-300">
+              Password
+            </label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              value={formData.password}
+              onChange={fieldChange}
+              className="mt-1 block w-full px-4 py-2 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-white bg-gray-700"
+              required
+            />
+          </div>
+    
+          {/* Submit Button */}
+          <button
+            type="submit"
+            className="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 hover:bg-blue-700"
+          >
+            Login
+          </button>
+    
+          {/* Sign Up Link */}
+          <div className="text-center mt-4 text-gray-400">
+            <p>Don't have an account?</p>
+            <Link href="/signup" className="text-blue-400 hover:text-blue-500">
+              Sign Up
+            </Link>
+          </div>
           
-          {/* Form */}
-          <form action="#" method="POST" onSubmit={handleSubmit}>
-            {/* First Name */}
-            <div className="mb-4">
-              <label htmlFor="username" className="block text-sm font-semibold text-gray-700">
-                Username
-              </label>
-              <input
-                type="text"
-                id="username"
-                name="username"
-                value={formData.username}
-                onChange={fieldChange}
-                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
-                required
-              />
-            </div>
-  
-  
-            {/* Password */}
-            <div className="mb-6">
-              <label htmlFor="password" className="block text-sm font-semibold text-gray-700">
-                Password
-              </label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                value={formData.password}
-                onChange={fieldChange}
-                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
-                required
-              />
-            </div>
-  
-            {/* Submit Button */}
-            <button
-              type="submit"
-              className="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 hover:bg-blue-700"
-              
-            >
-              Login
-            </button>
-            <p className="text-black"> Don't have an account? </p> 
-            <Link href="/signup" className="text-black"> Sign Up</Link>
-            
-            {error && <p className="text-red-500 mt-4">{error}</p>}
-          </form>
-        </div>
+          {error && <p className="text-red-500 mt-4">{error}</p>}
+        </form>
       </div>
+    </div>
     )
 }
 

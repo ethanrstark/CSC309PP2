@@ -105,7 +105,6 @@ model CodeTemplate {
   blogPosts    BlogPost[] 
   tags         Tag[]
   childForks   CodeTemplate[]    @relation("Forks")
-  environment  ExecutionEnvironment?
 }
 
 
@@ -170,20 +169,3 @@ model Report {
   comment    Comment?   @relation(fields: [commentId], references: [id], onDelete: SetNull)
   post       BlogPost?  @relation(fields: [postId], references: [id], onDelete: SetNull)
 } 
-
-
-// I'm not really sure about this one, I think we will make it more concrete in part 2
-model ExecutionEnvironment {
-  id          Int           @id @default(autoincrement())
-  templateId  Int           @unique
-  input       String? 
-  output      String?  
-  error       String?  
-  memoryUsed  Int
-  timeTaken   Int
-  executedAt  DateTime      @default(now())
-
-  // Relations:
-  template    CodeTemplate  @relation(fields: [templateId], references: [id], onDelete: Cascade) // TODO depending on implementation we may want to RESTRICT onDelete
-} 
-// TODO: Probably can safely delete this model
