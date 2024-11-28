@@ -126,7 +126,7 @@ const BlogPostList = () => {
 
   // If there's data, render the blog posts
   return (
-    <div className="blog-post-list">
+    <div className="blog-post-list bg-gray-900 text-white min-h-screen p-6">
       <h2>Blog Posts</h2>
       <div className="flex space-x-4 mb-4">
         <select

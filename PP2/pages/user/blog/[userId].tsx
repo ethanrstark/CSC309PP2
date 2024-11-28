@@ -103,7 +103,7 @@ const UserBlogPostList = () => {
 
   // If there's data, render the blog posts
   return (
-    <div className="user-blog-post-list">
+    <div className="user-blog-post-list bg-gray-900 text-white min-h-screen p-6">
       <h2>Blog Posts</h2>
       {data.blogPosts.map((post) => (
         <BlogPostCard
