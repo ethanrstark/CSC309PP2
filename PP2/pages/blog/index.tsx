@@ -219,6 +219,8 @@ const BlogPostList = () => {
       upvoteCount={post.upvoteCount}
       downvoteCount={post.downvoteCount}
       tags={post.tags.map((tag) => tag.name)}
+      isHidden={post.isHidden}
+      hiddenReason={post.hiddenReason}
     />
   ))
 ) : (
