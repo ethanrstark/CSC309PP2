@@ -1,8 +1,23 @@
+import { useState,useEffect } from 'react';
 
 import Link from 'next/link';
-
+import SignOutButton from "@/components/SignOutButton";
 const Sidebar: React.FC = () => {
+    const [isLoggedIn, setIsLoggedIn]=useState<boolean>(false)
 
+    useEffect(() =>{
+        const accessToken = localStorage.getItem("accessToken");
+        const refreshToken = localStorage.getItem("refreshToken");
+    
+        if (accessToken && refreshToken) {
+          setIsLoggedIn(true)
+          //setUserAvatar()
+      }},[])
+
+        // Function to handle sign-out
+  const handleSignOut = () => {
+    setIsLoggedIn(false); // Update the state to false when signed out
+  };
 
   return (
     <div className="flex">
@@ -21,6 +36,12 @@ const Sidebar: React.FC = () => {
                 <Link href="/login" className="block px-4 py-2 hover:bg-gray-700">
                     Login
                 </Link>
+
+                {isLoggedIn && (
+                <Link href="/edit_profile" className="block px-4 py-2 hover:bg-gray-700">
+                Profile
+                </Link>
+                )}
 
                 <Link href="/my_templates" className="block px-4 py-2 hover:bg-gray-700">
                     My Templates
@@ -41,6 +62,12 @@ const Sidebar: React.FC = () => {
                 <Link href="/reports" className="block px-4 py-2 hover:bg-gray-700">
                     Reports
                 </Link>
+
+                {isLoggedIn && (
+                
+                    <SignOutButton onSignOut={handleSignOut}/> 
+                
+                    )}
             </div>
         </nav>
        

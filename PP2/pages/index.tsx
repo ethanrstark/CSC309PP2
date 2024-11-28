@@ -1,15 +1,23 @@
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
 import Sidebar from './../components/sidebar/Sidebar';
 import Image from 'next/image';
 import logo from '../public/logo.jpg';
 
 export default function Home() {
   const [sidebarVisible, setSidebarVisible] = useState(true);
+  const [isLoggedIn, setIsLoggedIn]=useState<boolean>(false)
 
   const toggleSidebar = () => {
     setSidebarVisible(!sidebarVisible);
   };
+  useEffect(() =>{
+    const accessToken = localStorage.getItem("accessToken");
+    const refreshToken = localStorage.getItem("refreshToken");
 
+    if (accessToken && refreshToken) {
+      setIsLoggedIn(true)
+      //setUserAvatar()
+  }},[])
   return (
     <div className="flex h-screen w-screen bg-gray-900">
 
@@ -33,7 +41,7 @@ export default function Home() {
         >
           {sidebarVisible ? '☰' : '☰'}
         </button>
-        <div className="justify-center text-center">
+        <div className="text-white justify-center text-center">
           <h1 className="text-2xl font-bold mb-4">Home Page</h1>
           <div className="flex flex-row justify-center items-center space-x-4">
             <h1>Welcome to Scriptorium!</h1>

@@ -1,8 +1,11 @@
 
 import React from "react";
 import { useRouter } from "next/router";
-//import {getToken,verification} from "@/components/App"
-const LogOut = () => {
+interface SignOutButtonProps {
+    onSignOut: () => void; // Type for the onSignOut prop
+  }
+
+const LogOut : React.FC<SignOutButtonProps> = ({onSignOut}) => {
     const router=useRouter()
   const handleLogout=async()=>{
         try{
@@ -25,6 +28,7 @@ const LogOut = () => {
     })
     localStorage.removeItem("accessToken")
     localStorage.removeItem("refreshToken")
+    onSignOut()
     router.push('/')
     }else{
         const refreshResp=await fetch('/api/User/Refresh',{
@@ -47,11 +51,12 @@ const LogOut = () => {
         })
         localStorage.removeItem("accessToken")
         localStorage.removeItem("refreshToken")
+        onSignOut()
              router.push('/')
         } else{
             localStorage.removeItem("accessToken")
         localStorage.removeItem("refreshToken")
-             router.push('\login')
+             router.push('/login')
         }
         
        

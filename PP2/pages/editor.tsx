@@ -5,12 +5,10 @@ import Editor from "@monaco-editor/react";
 import Sidebar from '@/components/sidebar/Sidebar';
 import SaveEditTemplate from "@/components/SaveTemplateButton";
 import { useRouter } from 'next/router';
-//add in a prop 
-interface CodeEditorProp {
-    existId?:string          //existing or forked template id
-}
+
+
 //code editor component to be returned
-const CodeEditor: React.FC<CodeEditorProp> = ({existId}) => {
+const CodeEditor = () => {
     const [code, setCode] = useState('');
     const [language, setLanguage] = useState('javascript');
     const [stdin, setStdin] = useState('');

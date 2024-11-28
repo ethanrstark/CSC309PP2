@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import Select from 'react-select'; // To handle multi-select for tags
 import { components } from 'react-select';
 import { title } from 'process';
-
+import Link from "next/link";
 // Custom components for react-select to allow for tag creation
 const customSingleValue = ({ data }: any) => <div>{data.label}</div>;
 
@@ -181,6 +181,9 @@ const redirectToEditor = (templateId:number) => {
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
       rel="stylesheet"
     />
+      <div className="absolute top-4 left-4 text-white text-2xl ">
+  <Link href="/">Home</Link>
+</div>
     {/* Search Bar Section */}
     <div className="container mx-auto px-4 py-6 flex flex-wrap mb-4">
       {/* Search by Title */}
