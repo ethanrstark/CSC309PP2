@@ -201,7 +201,7 @@ console.log(res)
           </div>
   
           <div className="blog-post-list">
-      <h2>Blog Posts</h2>
+      <h2 className='text-3xl font-semibold mb-4'>Linked Blog Posts</h2>
       {blogPosts.length>0 ? (
         blogPosts.map((post) => {
             // Check if post is not hidden

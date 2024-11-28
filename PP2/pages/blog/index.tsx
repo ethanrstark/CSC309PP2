@@ -167,8 +167,10 @@ const BlogPostList = () => {
   // If there's data, render the blog posts
   return (
     <div className="blog-post-list">
-      <h2>Blog Posts</h2>
-      <div className="flex space-x-4 mb-4">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className='text-4xl font-semibold'>Blog Posts</h2>
+        <div className="flex items-center space-x-4 mr-4">
+          <p className="text-xl">Sort Controls:</p>
         <select
           name="sortBy"
           value={sortBy}
@@ -200,13 +202,10 @@ const BlogPostList = () => {
             </option>
           ))}
         </select>
-        <button className="hover:gray-500" onClick={() => setShowSearchForm(true)}>
-          <MagnifyingGlassIcon className="h-6 w-6 text-gray-900" />
-        </button>
+        </div>
       </div>
       {showSearchForm && <SearchForm handleSearchSubmit={handleSearchSubmit} onClose={() => setShowSearchForm(false)} />}
-      {data.blogPosts.length > 0 ? (
-  data.blogPosts.map((post) => (
+      {data.blogPosts.map((post) => (
     <BlogPostCard
       key={post.id}
       id={post.id}
@@ -222,10 +221,7 @@ const BlogPostList = () => {
       isHidden={post.isHidden}
       hiddenReason={post.hiddenReason}
     />
-  ))
-) : (
-  <NoBlogPosts />
-)}
+  ))}
 
           <Pagination
         currentPage={router.query.page ? parseInt(router.query.page as string) : 1}

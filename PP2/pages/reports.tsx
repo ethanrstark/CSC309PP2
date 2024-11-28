@@ -1,16 +1,9 @@
 import { useEffect, useState } from 'react';
-import Sidebar from './../components/sidebar/Sidebar';
 
 const reports = () => {
     const [posts , setPosts] = useState([]);
     const [comments, setComments] = useState([]);
     const [accessDenied, setAccessDenied] = useState(false);
-
-    const [sidebarVisible, setSidebarVisible] = useState(true);
-
-    const toggleSidebar = () => {
-      setSidebarVisible(!sidebarVisible);
-    };
 
 
     const handleReportedComments = async () => {
@@ -154,28 +147,12 @@ const reports = () => {
         </div>
         ) : (
         <div className="flex h-screen w-screen bg-gray-900">
-            <div
-            className={`bg-gray-800 text-white w-64 min-h-screen p-6 fixed top-0 left-0 transition-all duration-400 ${
-                sidebarVisible ? 'translate-x-0' : '-translate-x-full'
-            }`}
-            >
-            <Sidebar />
-            </div>
+            
     
     
             <main
-            className={`p-6 transition-all duration-400 h-screen w-screen bg-gray-900${
-                sidebarVisible ? 'flex-1 ml-64' : 'flex-1 ml-0'
-            }`}
+            className={`p-6 h-screen w-screen bg-gray-900`}
             >
-                
-            <button
-                onClick={toggleSidebar}
-                className="bg-gray-800 text-white p-2 mb-4"
-            >
-                {sidebarVisible ? '☰' : '☰'}
-            </button>
-
 
             <div className="justify-center text-center">
                     <button

@@ -1,11 +1,12 @@
 // components/blog/CommentCard.tsx
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import UserAvatar from "@/components/blog/UserAvatar";
+import UserAvatar from "@/components/blog/BlogAvatar";
 import ReportForm from '@/components/forms/ReportForm';
 import RatingForm from '@/components/forms/RatingForm';
-import CommentForm from '@/components/blog/CommentForm';
-import { FlagIcon, ChatBubbleLeftEllipsisIcon } from "@heroicons/react/24/outline";
+import CommentForm from '@/components/forms/CommentForm';
+import { FlagIcon } from "@heroicons/react/24/outline";
+import Hidden from '@/components/errors/Hidden';
 import { REPLIES_LIMIT } from '@/constants';
 
 type CommentCardProps = {
@@ -270,6 +271,7 @@ const CommentCard: React.FC<CommentCardProps> = ({
   // )}
   return (
     <div className="comment" style={{ marginLeft: `${indentLevel * 20}px` }}>
+      {isHidden && (<Hidden type="comment" hiddenReason={hiddenReason || "No reason provided"} />)}
       <div className="flex items-start mb-4">
         <UserAvatar
           userId={authorId}

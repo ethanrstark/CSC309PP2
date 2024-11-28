@@ -83,6 +83,7 @@ const myPosts = () => {
         if (refreshResp.ok) {
           const data = await refreshResp.json();
           sessionStorage.setItem("accessToken", data.accessToken);
+          setUserId(data.id);
         } else {
           router.push('/login');
         }
@@ -141,7 +142,7 @@ const myPosts = () => {
   // If there's data, render the blog posts
   return (
     <div className="user-blog-post-list bg-gray-900 text-white min-h-screen p-6">
-      <h2>Blog Posts</h2>
+      <h2 className='text-4xl font-semibold mb-4'>Blog Posts</h2>
       {data.blogPosts.map((post) => (
         <BlogPostCard
           key={post.id}
@@ -159,7 +160,7 @@ const myPosts = () => {
           hiddenReason={post.hiddenReason}
         />
       ))}
-
+      <div className="flex justify-center items-center mt-6">
       <Pagination
         currentPage={router.query.page ? parseInt(router.query.page as string) : 1}
         totalPages={Math.ceil(data.postCount / (router.query.limit ? parseInt(router.query.limit as string) : BLOG_POST_LIMIT))}
@@ -170,6 +171,7 @@ const myPosts = () => {
           })
         }
       />
+      </div>
     </div>
   );
 };

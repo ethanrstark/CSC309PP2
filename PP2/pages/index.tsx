@@ -1,58 +1,53 @@
-import { useState,useEffect } from 'react';
-import Sidebar from './../components/sidebar/Sidebar';
+import { useRouter } from 'next/router';
 import Image from 'next/image';
-import logo from '../public/logo.jpg';
+import logo from '../public/logo.jpg'; 
 
-export default function Home() {
-  const [sidebarVisible, setSidebarVisible] = useState(true);
-  const [isLoggedIn, setIsLoggedIn]=useState<boolean>(false)
+const Home = () => {
+  const router = useRouter();
 
-  const toggleSidebar = () => {
-    setSidebarVisible(!sidebarVisible);
-  };
-  useEffect(() =>{
-    const accessToken = localStorage.getItem("accessToken");
-    const refreshToken = localStorage.getItem("refreshToken");
-
-    if (accessToken && refreshToken) {
-      setIsLoggedIn(true)
-      //setUserAvatar()
-  }},[])
   return (
-    <div className="flex h-screen w-screen bg-gray-900">
-
-      <div
-        className={`bg-gray-800 text-white w-64 min-h-screen p-6 fixed top-0 left-0 transition-all duration-400 ${
-          sidebarVisible ? 'translate-x-0' : '-translate-x-full'
-        }`}
-      >
-        <Sidebar />
+    <div className="flex flex-col min-h-screen bg-gray-900 text-white">
+      {/* Header Section */}
+      <div className="flex flex-col items-center justify-center p-6">
+        <h1 className="text-4xl font-bold mb-4">Home Page</h1>
+        <div className="flex flex-row justify-center items-center space-x-4">
+          <h2 className="text-xl">Welcome to Scriptorium!</h2>
+          <Image src={logo} alt="Logo" className="h-12 w-12 rounded-lg" />
+        </div>
       </div>
 
-
-      <main
-        className={`p-6 transition-all duration-400 ${
-          sidebarVisible ? 'flex-1 ml-64' : 'flex-1 ml-0'
-        }`}
-      >
-        <button
-          onClick={toggleSidebar}
-          className="bg-gray-800 text-white p-2 mb-4"
-        >
-          {sidebarVisible ? '☰' : '☰'}
-        </button>
-        <div className="text-white justify-center text-center">
-          <h1 className="text-2xl font-bold mb-4">Home Page</h1>
-          <div className="flex flex-row justify-center items-center space-x-4">
-            <h1>Welcome to Scriptorium!</h1>
-            <Image src={logo} alt="Logo" className="h-12 w-12 rounded-lg"/>
-          </div>
-
+      {/* Card Section */}
+      <div className="flex-grow flex flex-col items-center justify-center space-y-8 p-6">
+        {/* Blog Post Card */}
+        <div className="bg-gray-800 shadow-lg rounded-lg p-8 w-full max-w-2xl flex flex-col items-center">
+          <h2 className="text-2xl font-semibold mb-4">Create a Blog Post</h2>
+          <p className="text-center mb-6">
+            Share your knowledge, ideas, or stories with the community by creating a new blog post.
+          </p>
+          <button
+            onClick={() => router.push('/blog/create')}
+            className="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700"
+          >
+            Create Blog Post
+          </button>
         </div>
 
-      </main>
-
-
+        {/* Code Template Card */}
+        <div className="bg-gray-800 shadow-lg rounded-lg p-8 w-full max-w-2xl flex flex-col items-center">
+          <h2 className="text-2xl font-semibold mb-4">Create a Code Template</h2>
+          <p className="text-center mb-6">
+            Contribute reusable code snippets or templates to help others with their projects.
+          </p>
+          <button
+            onClick={() => router.push('/editor')}
+            className="bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700"
+          >
+            Create Code Template
+          </button>
+        </div>
+      </div>
     </div>
   );
-}
+};
+
+export default Home;

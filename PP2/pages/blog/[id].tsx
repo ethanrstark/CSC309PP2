@@ -13,7 +13,7 @@ import CommentCard from '@/components/blog/CommentCard';
 import NoComments from '@/components/errors/NoComments';
 import NoBlogPosts from '@/components/errors/NoBlogPosts';
 import RatingForm from '@/components/forms/RatingForm';
-import CommentForm from '@/components/blog/CommentForm';
+import CommentForm from '@/components/forms/CommentForm';
 import EllipsisDropdownButton from '@/components/buttons/EllipsisDropdownButton';
 
 import { COMMENT_LIMIT } from '@/constants';
@@ -295,7 +295,7 @@ const BlogPostDetail = () => {
       }
     };
     fetchData();
-  }, [id, router.isReady, router.query]);
+  }, [id, router.isReady]);
 
 
    // If there was an error, show an error message
@@ -312,77 +312,89 @@ const BlogPostDetail = () => {
     year: "numeric", month: "long", day: "numeric", hour: "numeric", minute: "numeric",
   }).format(new Date(date));
 
-  return (
-    <div className="blog-post-detail">
-      <div className="flex items-center justify-between">
-        <h1>{post.title}</h1>
-        {userId === post.author.id && 
-        <EllipsisDropdownButton onUpdate={handleUpdate} onDelete={handleDelete} />}
+    return (
+      <div className="blog-post-detail p-6 border border-gray-300 rounded-lg bg-gray-800 mb-6 mx-4">
+      <div className="flex items-center justify-between mb-4">
+        <h1 className="text-3xl font-semibold text-white">{post.title}</h1>
+        {userId === post.author.id && (
+          <EllipsisDropdownButton onUpdate={handleUpdate} onDelete={handleDelete} />
+        )}
       </div>
-      <UserAvatar
-        userId={post.author.id}
-        avatarUrl={post.author.avatar}
-        username={post.author.userName}
-      />
-  
-      <p>{post.description}</p>
-      
-      <div className="text-sm font-medium">
-        <p>Author: {post.author.userName}</p>
+    
+      <div className="flex items-center mb-4">
+        <UserAvatar
+          userId={post.author.id}
+          avatarUrl={post.author.avatar}
+          username={post.author.userName}
+        />
+        <div className="ml-4 text-sm text-gray-400">
+          <p className="font-medium text-gray-300">Author: {post.author.userName}</p>
+          <p className="text-gray-500">Created At: {formattedDate(post.createdAt)}</p>
+          <p className="text-gray-500">Updated At: {formattedDate(post.updatedAt)}</p>
+        </div>
       </div>
-  
-      <RatingForm upvoteCount={upvoteTotal} downvoteCount={downvoteTotal} userVote={userVote} onVoteChange={handleVote} />
-  
-      <div className="mt-4">
-        <p>Created At: {formattedDate(post.createdAt)}</p>
-        <p>Updated At: {formattedDate(post.updatedAt)}</p>
-      </div>
-  
-      <div className="mt-6">
-        <h2 className="text-lg font-semibold">Tags:</h2>
-        <ul>
+    
+      <p className="text-gray-300 mb-4">{post.description}</p>
+    
+      <div className="flex items-center space-x-6 text-sm text-gray-400 mb-4">
+        <RatingForm
+          upvoteCount={upvoteTotal}
+          downvoteCount={downvoteTotal}
+          userVote={userVote}
+          onVoteChange={handleVote}
+        />
+        <div className="flex flex-wrap mt-2">
           {post.tags.map((tag) => (
-            <li key={tag.id}>{tag.name}</li>
+            <span
+              key={tag.id}
+              className="tag inline-block px-3 py-1 mr-2 mb-2 text-xs font-medium bg-gray-700 text-gray-300 rounded-full"
+            >
+              {tag.name}
+            </span>
           ))}
-        </ul>
+        </div>
       </div>
-  
-      <div className="mt-6">
-        <h2 className="text-lg font-semibold">Templates:</h2>
+    
+      <div className="mt-4">
+        <h2 className="text-lg font-semibold text-white">Templates:</h2>
         <ul>
           {post.templates.map((template) => (
             <li key={template.id}>
-              <Link href={`/ViewTemplate/${template.id}`}> 
-                {template.title}
+              <Link href={`/ViewTemplate/${template.id}`}>
+                <a className="text-sm text-gray-300 hover:text-gray-200">
+                  {template.title}
+                </a>
               </Link>
             </li>
           ))}
         </ul>
       </div>
-      <button
-           onClick={handleOpenReportForm}
-           className="flex items-center text-sm font-medium text-gray-700 hover:text-gray-900"
-         >
-           <FlagIcon className="h-5 w-5 mr-2" />
-         </button>
-         <button
-           onClick={handleOpenCommentForm}
-           className="flex items-center text-sm font-medium text-gray-700 hover:text-gray-900"
-         >
-           <ChatBubbleLeftEllipsisIcon className="h-5 w-5 mr-2" />
-         </button>
-   
-         {showReportForm && (
-           <ReportForm
-             targetId={post.id}
-             targetType="post"
-             onClose={handleCloseReportForm}
-           />
-         )}
-         {showCommentForm && (
-           <CommentForm postId={post.id} onClose={handleCloseCommentForm} onSubmit={handleCommentSubmit} />
-         )}
-         
+    
+      <div className="mt-4">
+        <button
+          onClick={handleOpenReportForm}
+          className="flex items-center text-sm font-medium text-gray-700 hover:text-gray-900"
+        >
+          <FlagIcon className="h-5 w-5 mr-2" />
+          Report Post
+        </button>
+        <button
+          onClick={handleOpenCommentForm}
+          className="flex items-center text-sm font-medium text-gray-700 hover:text-gray-900 ml-4"
+        >
+          <ChatBubbleLeftEllipsisIcon className="h-5 w-5 mr-2" />
+          Comment
+        </button>
+      </div>
+    
+      {showReportForm && (
+        <ReportForm targetId={post.id} targetType="post" onClose={handleCloseReportForm} />
+      )}
+    
+      {showCommentForm && (
+        <CommentForm postId={post.id} onClose={handleCloseCommentForm} onSubmit={handleCommentSubmit} />
+      )}
+    
       {commentData.comments.length === 0 ? (
         <NoComments />
       ) : (
@@ -404,14 +416,19 @@ const BlogPostDetail = () => {
             hiddenReason={comment.hiddenReason}
           />
         ))
-      )} 
-      <Pagination
-        currentPage={router.query.page ? parseInt(router.query.page as string) : 1}
-        totalPages={Math.ceil(commentData.commentCount / (router.query.limit ? parseInt(router.query.limit as string) : COMMENT_LIMIT))}
-        onPageChange={(page: number) => router.push({ pathname: `/blog/${id}`, query: { ...router.query, page }})}
-      />
+      )}
+    
+      {commentData.comments.length > 0 && (
+        <Pagination
+          currentPage={router.query.page ? parseInt(router.query.page as string) : 1}
+          totalPages={Math.ceil(commentData.commentCount / (router.query.limit ? parseInt(router.query.limit as string) : COMMENT_LIMIT))}
+          onPageChange={(page: number) => router.push({ pathname: `/blog/${id}`, query: { ...router.query, page } })}
+        />
+      )}
     </div>
-  );  
+    
+
+    );
 };
 
 

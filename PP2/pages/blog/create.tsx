@@ -1,20 +1,21 @@
 import React, { useEffect, useState } from "react";
 import CreateBlogPostForm from "@/components/forms/CreateBlogPostForm";
+import { useRouter } from "next/router";
 
 export default function CreateBlogPostPage() {
   const [tags, setTags] = useState([]);
   const [templates, setTemplates] = useState([]);
-  const [ showCreateForm, setShowCreateForm ] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [showCreateForm, setShowCreateForm ] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
+  const router = useRouter();
 
 
   const handleCloseReportForm = () => { 
     setShowCreateForm(false);
+    router.back();
   }
 
   useEffect(() => {
-    setIsLoading(true);
     const fetchTags = async () => {
       try {
         const response = await fetch(`/api/tag/getAll`, {cache: "no-cache"});
@@ -39,12 +40,7 @@ export default function CreateBlogPostPage() {
 
     fetchTags();
     fetchTemplates();
-    setIsLoading(false);
   }, []);
-
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
 
   if (error) {
     alert(`Error ${error}`);
@@ -53,8 +49,7 @@ export default function CreateBlogPostPage() {
 
   return (
     <div className="p-6 bg-gray-900 text-white min-h-screen ">
-        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={() => setShowCreateForm(true)}> Create </button>
-      {showCreateForm && <CreateBlogPostForm availableTags={tags} availableTemplates={templates} closeForm={handleCloseReportForm} />}
+      {showCreateForm && (<CreateBlogPostForm availableTags={tags} availableTemplates={templates} closeForm={handleCloseReportForm} /> )}
     </div>
   );
 }
