@@ -1,6 +1,6 @@
 // pages/blog/[id].tsx
 
-import React, { useEffect, useState } from 'react';
+import React, { cache, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { jwtDecode } from 'jwt-decode';
@@ -94,7 +94,7 @@ const BlogPostDetail = () => {
 
         if (response.status === 401 || response.status === 403) {
           const refreshResp = await fetch('/api/User/Refresh', {
-            headers: { authorization: `Bearer ${localStorage.getItem('refreshToken')}` },
+            headers: { authorization: `Bearer ${localStorage.getItem('refreshToken')}` }, cache: 'no-store',
           });
 
           if (refreshResp.ok) {
@@ -147,7 +147,7 @@ const BlogPostDetail = () => {
 
       if (response.status === 401 || response.status === 403) {
         const refreshResp = await fetch('/api/User/Refresh', {
-          headers: { authorization: `Bearer ${localStorage.getItem('refreshToken')}` },
+          headers: { authorization: `Bearer ${localStorage.getItem('refreshToken')}` }, cache: 'no-store',
         });
 
         if (refreshResp.ok) {
@@ -202,7 +202,7 @@ const BlogPostDetail = () => {
 
       if (response.status === 401 || response.status === 403) {
         const refreshResp = await fetch('/api/User/Refresh', {
-          headers: { authorization: `Bearer ${localStorage.getItem('refreshToken')}` },
+          headers: { authorization: `Bearer ${localStorage.getItem('refreshToken')}` }, cache: 'no-store',
         });
 
         if (refreshResp.ok) {
@@ -263,7 +263,7 @@ const BlogPostDetail = () => {
           setUserId(decodedToken.id);
         }
         const [postResponse, voteResponse, commentsResponse] = await Promise.all([
-          fetch(`/api/blog/${id}`),
+          fetch(`/api/blog/${id}`,{ cache: "no-store"}),
           fetch(`/api/blog/${id}/userRated`, { headers: { authorization: `Bearer ${token}` } }),
           fetch(`/api/blog/${id}/comments?page=${router.query.page || 1}&limit=${COMMENT_LIMIT}&countComments=true`, { headers: { authorization: `Bearer ${token}` }, cache: "no-store" }),
         ]);
@@ -316,9 +316,7 @@ const BlogPostDetail = () => {
       <div className="blog-post-detail p-6 border border-gray-300 rounded-lg bg-gray-800 mb-6 mx-4">
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-3xl font-semibold text-white">{post.title}</h1>
-        {userId === post.author.id && (
-          <EllipsisDropdownButton onUpdate={handleUpdate} onDelete={handleDelete} />
-        )}
+      
       </div>
     
       <div className="flex items-center mb-4">
@@ -359,11 +357,9 @@ const BlogPostDetail = () => {
         <h2 className="text-lg font-semibold text-white">Templates:</h2>
         <ul>
           {post.templates.map((template) => (
-            <li key={template.id}>
+            <li key={template.id} className="text-sm text-gray-300 hover:text-gray-200">
               <Link href={`/ViewTemplate/${template.id}`}>
-                <a className="text-sm text-gray-300 hover:text-gray-200">
                   {template.title}
-                </a>
               </Link>
             </li>
           ))}
@@ -434,32 +430,15 @@ const BlogPostDetail = () => {
 
 export default BlogPostDetail;
 
-{/*
-// TODO add a flag for deleting
-// TODO add a flag for editing
-// TODO add a flag for creating
-// TODO add a flag for adding tags
-// TODO add a flag for adding templates
-// TODO if this post is hidden add a flag and disable the button for editing
+{/* TODO
+change to trash can and edit pencil if is hidden then disable the edit button
+{userId === post.author.id && (
+  <EllipsisDropdownButton onUpdate={handleUpdate} onDelete={handleDelete} />
+)}
 */}
-{/** TODO should I indluce hidden and hidden reason for admins to see? */}
 
-{/*
-  
-        <Pagination
-          currentPage={data.pageNum}
-          totalPages={Math.ceil(data.postCount / data.pageLimit)}
-          onPageChange={(page) =>
-            router.push({
-              pathname: "/blog",
-              query: { ...router.query, page },
-            })
-          }
-        />
-        */}
-   {/* TODO: Create comment section with pagination and cards */}
+// TODO add a flag for creating
 
-   
  
    
     

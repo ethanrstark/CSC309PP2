@@ -82,7 +82,7 @@ export default function My_Templates(){
         
         if(refreshResp.ok){
             const data = await refreshResp.json()
-           sessionStorage.setItem("accessToken",data.accessToken)
+           localStorage.setItem("accessToken",data.accessToken)
         } else{
              router.push('\login')
         }

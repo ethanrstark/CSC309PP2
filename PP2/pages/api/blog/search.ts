@@ -31,8 +31,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     let {
         title = "",
         description = "",
-        tags,
-        templates,
+        tags= "",
+        templates = "",
     } = req.query as any;
 
     const {
@@ -65,15 +65,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(400).json({ error: "Invalid countPosts query parameter" });
     }
 
-    try {
-        title = title ? decodeURIComponent(title) : null;
-        description = description ? decodeURIComponent(description) : null;
-        tags = tags ? decodeURIComponent(tags) : null;
-        templates = templates ? decodeURIComponent(templates) : null;
-    } catch (e) {
-        return res.status(400).json({ error: "Invalid query parameter encoding" });
-    }
-    
     const sortOptions: SortOptionType[] = [
         { [sortBy as string]: sortOrder as "asc" | "desc" }, // Primary sorting criterion
         { id: "asc" }, // Secondary unique sort by id to guarantee stable sorting
