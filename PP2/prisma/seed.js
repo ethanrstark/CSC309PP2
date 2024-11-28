@@ -477,7 +477,7 @@ async function main() {
                 explanation: "Basic JS example",
                 code: 'console.log("Hello, JavaScript!");',
                 file_name: "hello.js",
-                language: "JavaScript",
+                language: "javascript",
             },
             {
                 title: "Python Greeter",
@@ -485,7 +485,7 @@ async function main() {
                 explanation: "Print greeting in Python",
                 code: 'print("Hello, Python!")',
                 file_name: "greet.py",
-                language: "PYTHON",
+                language: "python",
             },
             {
                 title: "C Math Operations",
@@ -493,7 +493,7 @@ async function main() {
                 explanation: "Basic math operations in C",
                 code: '#include<stdio.h>\nint main() {\n  int a = 10, b = 20;\n  printf("Sum: %d", a + b);\n  return 0;\n}',
                 file_name: "math.c",
-                language: "C",
+                language: "c",
             },
             {
                 title: "Dynamic Arrays in C++",
@@ -501,7 +501,7 @@ async function main() {
                 explanation: "Manage dynamic arrays in C++",
                 code: '#include <iostream>\n#include <vector>\nint main() {\n  std::vector<int> arr = {1, 2, 3};\n  arr.push_back(4);\n  for (int i : arr) std::cout << i << " ";\n}',
                 file_name: "dynamic_array.cpp",
-                language: "CPP",
+                language: "cpp",
             },
             {
                 title: "Java Threads",
@@ -509,7 +509,7 @@ async function main() {
                 explanation: "Simple threading in Java",
                 code: 'class MyThread extends Thread {\n  public void run() {\n    System.out.println("Thread is running.");\n  }\n}\npublic class Main {\n  public static void main(String[] args) {\n    new MyThread().start();\n  }\n}',
                 file_name: "thread.java",
-                language: "JAVA",
+                language: "java",
             },
             {
                 title: "Python Data Processing",
@@ -517,7 +517,7 @@ async function main() {
                 explanation: "Process lists with Python",
                 code: "data = [1, 2, 3, 4]\nprint([x**2 for x in data])",
                 file_name: "process.py",
-                language: "PYTHON",
+                language: "python",
             },
             {
                 title: "Simple Calculator in Swift",
@@ -528,7 +528,7 @@ async function main() {
               let b = 10
               print("Sum: \\(a + b)")`,
                 file_name: "calculator.swift",
-                language: "Swift",
+                language: "swift",
             },
             {
                 title: "Factorial in Java",
@@ -536,7 +536,7 @@ async function main() {
                 explanation: "Calculate factorial using recursion",
                 code: "class Main {\n  public static int factorial(int n) {\n    return (n == 1) ? 1 : n * factorial(n - 1);\n  }\n  public static void main(String[] args) {\n    System.out.println(factorial(5));\n  }\n}",
                 file_name: "factorial.java",
-                language: "JAVA",
+                language: "java",
             },
             {
                 title: "Hello Ruby",
@@ -544,7 +544,7 @@ async function main() {
                 explanation: "Basic Ruby hello world example",
                 code: 'puts "Hello, Ruby!"',
                 file_name: "hello.rb",
-                language: "Ruby",
+                language: "ruby",
             },
             {
                 title: "Fibonacci Sequence in Go",
@@ -563,7 +563,7 @@ async function main() {
                 fmt.Println(fibonacci(10))
                 }`,
                 file_name: "fibonacci.go",
-                language: "Go",
+                language: "go",
             },
         ],
     });
@@ -576,7 +576,7 @@ await prisma.codeTemplate.create({
       explanation: "Print FizzBuzz for numbers 1 to 100",
       code: 'for i in range(1, 101):\n  if i % 15 == 0:\n    print("FizzBuzz")\n  elif i % 3 == 0:\n    print("Fizz")\n  elif i % 5 == 0:\n    print("Buzz")\n  else:\n    print(i)',
       file_name: "fizzbuzz.py",
-      language: "PYTHON",
+      language: "python",
       tags: { connect: [{ id: 1 }, { id: 15 }] },
     },
   });
@@ -588,7 +588,7 @@ await prisma.codeTemplate.create({
       explanation: "QuickSort algorithm implementation",
       code: "#include <iostream>\nvoid quickSort(int[], int, int);\nint main() { /*...*/ }",
       file_name: "quicksort.cpp",
-      language: "CPP",
+      language: "cpp",
       tags: { connect: [{ id: 3 }, { id: 7 }, { id: 12 }] },
     },
   });
@@ -600,7 +600,7 @@ await prisma.codeTemplate.create({
       explanation: "Recursive factorial function",
       code: "function factorial(n) {\n  return n === 0 ? 1 : n * factorial(n - 1);\n}",
       file_name: "factorial.js",
-      language: "JavaScript",
+      language: "javascript",
       tags: { connect: [{ id: 4 }, { id: 9 }, { id: 16 }] },
     },
   });
@@ -618,7 +618,7 @@ await prisma.codeTemplate.create({
     println!("Is 'racecar' a palindrome? {}", is_palindrome("racecar"));
   }`,
       file_name: "palindrome.rs",
-      language: "Rust",
+      language: "rust",
       tags: { connect: [{ id: 6 }] },
     },
   });
@@ -630,7 +630,7 @@ await prisma.codeTemplate.create({
       explanation: "Implementation of BST",
       code: "class Node { int key; Node left, right; }\nclass BST { /*...*/ }",
       file_name: "bst.java",
-      language: "JAVA",
+      language: "java",
       tags: { connect: [{ id: 20 }] },
     },
   });
@@ -642,7 +642,7 @@ await prisma.codeTemplate.create({
       explanation: "Perform basic calculations",
       code: "#include<stdio.h>\nint main() { int a, b; char op; /*...*/ }",
       file_name: "calc.c",
-      language: "C",
+      language: "c",
       tags: { connect: [{ id: 5 }, { id: 13 }, { id: 14 }] },
     },
   });
@@ -654,7 +654,7 @@ await prisma.codeTemplate.create({
       explanation: "Check if a number is prime",
       code: "def is_prime(n):\n  if n <= 1: return False\n  for i in range(2, int(n**0.5) + 1):\n    if n % i == 0: return False\n  return True",
       file_name: "prime.py",
-      language: "PYTHON",
+      language: "python",
       tags: { connect: [{ id: 8 }, { id: 12 }, { id: 17 }] },
     },
   });
@@ -666,7 +666,7 @@ await prisma.codeTemplate.create({
       explanation: "Basic CRUD functions",
       code: "let db = [];\nfunction create(item) { db.push(item); }\nfunction read() { return db; }\n",
       file_name: "crud.js",
-      language: "JavaScript",
+      language: "javascript",
       tags: { connect: [{ id: 4 }, { id: 9 }, { id: 16 }, { id: 12 }, { id: 17 }] },
     },
   });
@@ -678,7 +678,7 @@ await prisma.codeTemplate.create({
       explanation: "Efficient sorting algorithm",
       code: "class MergeSort {\n  void merge(int arr[], int l, int m, int r) {\n    /*...*/\n  }\n}",
       file_name: "mergesort.java",
-      language: "JAVA",
+      language: "java",
       tags: { connect: [{ id: 6 }, { id: 10 }, { id: 18 }, { id: 14 }] },
     },
   });
@@ -690,7 +690,7 @@ await prisma.codeTemplate.create({
       explanation: "Read content from a file",
       code: '#include <fstream>\nint main() {\n  std::ifstream file("example.txt");\n  /*...*/\n}',
       file_name: "filereader.cpp",
-      language: "CPP",
+      language: "cpp",
       tags: { connect: [{ id: 5 }, { id: 11 }, { id: 13 }, { id: 9 }, { id: 2 }] },
     },
   });
@@ -703,7 +703,7 @@ await prisma.codeTemplate.create({
       explanation: "Modified JS example",
       code: `console.log("Hello, World Wide Web!");`,
       file_name: "hello.js",
-      language: "JavaScript",
+      language: "javascript",
       isFork: true,
       originalId: 1,
     },
@@ -717,7 +717,7 @@ await prisma.codeTemplate.create({
       code: `name = input("What is your name? ")
       print(f"Hello, {name}!")`,
       file_name: "greet.py",
-      language: "PYTHON",
+      language: "python",
       isFork: true,
       originalId: 2,
     },
@@ -736,7 +736,7 @@ await prisma.codeTemplate.create({
         for (int x : arr) std::cout << x << " ";
       }`,
       file_name: "dynamic_array.cpp",
-      language: "CPP",
+      language: "cpp",
       isFork: true,
       originalId: 4,
     },
@@ -749,7 +749,7 @@ await prisma.codeTemplate.create({
       explanation: "Basic array operations in Ruby",
       code: 'arr = [1, 2, 3, 4]\narr.push(5)\nputs arr.inspect',
       file_name: "array.rb",
-      language: "RUBY",
+      language: "ruby",
       isFork: true,
       originalId: 9,
     },
@@ -763,7 +763,7 @@ await prisma.codeTemplate.create({
       explanation: "CSC309 PP1 (forked)",
       code: `console.log("Hello Whole Wide World");`,
       file_name: "index.js",
-      language: "JavaScript",
+      language: "javascript",
       isFork: true,
       originalId: 1,
       tags: {
@@ -780,8 +780,8 @@ await prisma.codeTemplate.create({
       code: `let todos: string[] = ["Learn Prisma", "Build API"];
       todos.push("Test Application");
       console.log(todos);`,
-      file_name: "todo_list.ts",
-      language: "TypeScript",
+      file_name: "todo_list.php",
+      language: "php",
       isFork: true,
       originalId: 1,
       tags: { connect: [{ id: 11 }] },
@@ -797,7 +797,7 @@ await prisma.codeTemplate.create({
       void quickSort(int[], int, int);
       int main() { /* Enhanced logic here */ }`,
       file_name: "quicksort_optimized.cpp",
-      language: "CPP",
+      language: "cpp",
       isFork: true,
       originalId: 23,
       tags: { connect: [{ id: 7 }, { id: 14 }] },
@@ -820,7 +820,7 @@ await prisma.codeTemplate.create({
     else:
       print(i)`,
         file_name: "fizzbuzz_forked.py",
-        language: "PYTHON",
+        language: "python",
         isFork: true,
         originalId: 1,
         tags: { connect: [{ id: 11 }] },
@@ -836,7 +836,7 @@ await prisma.codeTemplate.create({
 void quickSort(int[], int, int);
 int main() { /* Enhanced logic here */ }`,
         file_name: "quicksort_optimized.cpp",
-        language: "CPP",
+        language: "cpp",
         isFork: true,
         originalId: 23,
         tags: { connect: [{ id: 2 }, { id: 7 }, { id: 12 }, { id: 10 }, { id: 20 }] },
@@ -854,7 +854,7 @@ function factorial(n) {
   return memo[n] = n === 0 ? 1 : n * factorial(n - 1);
 }`,
         file_name: "factorial_memo.js",
-        language: "JavaScript",
+        language: "javascript",
         isFork: true,
         originalId: 3,
         tags: { connect: [{ id: 3 }, { id: 8 }] },
@@ -868,7 +868,7 @@ await prisma.codeTemplate.create({
         explanation: "Flask REST API with database integration",
         code: 'from flask import Flask, jsonify\napp = Flask(__name__)\n@app.route("/api/v1/resource")\ndef resource():\n  return jsonify({"key": "value"})',
         file_name: "api_db.py",
-        language: "PYTHON",
+        language: "python",
         isFork: true,
         originalId: 4,
         tags: { connect: [{ id: 4 }, { id: 10 }] },
@@ -882,7 +882,7 @@ await prisma.codeTemplate.create({
         explanation: "BST with delete functionality",
         code: 'class Node { int key; Node left, right; }\nclass BST {\n  void deleteKey(int key) { /* Delete logic */ }\n}',
         file_name: "bst_with_delete.java",
-        language: "JAVA",
+        language: "java",
         isFork: true,
         originalId: 5,
         tags: { connect: [{ id: 6 }, { id: 11 }, { id: 14 }] },
@@ -896,7 +896,7 @@ await prisma.codeTemplate.create({
         explanation: "Matrix multiplication with input validation",
         code: 'import numpy as np\n# Add validation logic here\nA = np.array([[1, 2], [3, 4]])\nB = np.array([[5, 6], [7, 8]])\nprint(np.dot(A, B))',
         file_name: "matrix_validate.py",
-        language: "PYTHON",
+        language: "python",
         isFork: true,
         originalId: 11,
         tags: { connect: [{ id: 1 }, { id: 8 }, { id: 15 }, { id: 14 }, { id: 13 }, { id: 19 }] },
@@ -910,7 +910,7 @@ await prisma.codeTemplate.create({
         explanation: "MergeSort with iterative approach",
         code: 'class MergeSort {\n  void iterativeMergeSort(int arr[]) {\n    // Implementation here\n  }\n}',
         file_name: "iterative_mergesort.java",
-        language: "JAVA",
+        language: "java",
         isFork: true,
         originalId: 32,
         tags: { connect: [{ id: 2 }, { id: 9 }, { id: 16 }] },
@@ -924,7 +924,7 @@ await prisma.codeTemplate.create({
         explanation: "Check for prime numbers in Swift",
         code: 'func isPrime(_ number: Int) -> Bool {\n  if number < 2 { return false }\n  for i in 2..<number {\n    if number % i == 0 { return false }\n  }\n  return true\n}\nprint(isPrime(7))',
         file_name: "prime_checker.swift",
-        language: "Swift",
+        language: "swift",
         isFork: true,
         originalId: 7,
         tags: { connect: [{ id: 7 }] },
@@ -949,7 +949,7 @@ await prisma.codeTemplate.create({
         http.ListenAndServe(":8080", nil)
         }`,
         file_name: "http_server.go",
-        language: "Go",
+        language: "go",
         isFork: true,
         originalId: 10,
         tags: { connect: [{ id: 6 }] },
@@ -963,7 +963,7 @@ await prisma.codeTemplate.create({
         explanation: "CRUD with logging",
         code: 'let db = [];\nfunction create(item) { db.push(item); console.log("Created:", item); }\nfunction read() { return db; }',
         file_name: "crud_logging.js",
-        language: "JavaScript",
+        language: "javascript",
         isFork: true,
         originalId: 8,
         tags: { connect: [{ id: 9 }, { id: 14 }, { id: 18 }] },
@@ -977,7 +977,7 @@ await prisma.codeTemplate.create({
         explanation: "Scrape with pagination support",
         code: 'import requests\nfrom bs4 import BeautifulSoup\ndef scrape_pages(urls):\n  for url in urls:\n    resp = requests.get(url)\n    soup = BeautifulSoup(resp.text, "html.parser")\n    print(soup.title)',
         file_name: "scraper_pages.py",
-        language: "PYTHON",
+        language: "python",
         isFork: true,
         originalId: 12,
         tags: { connect: [{ id: 5 }, { id: 11 }] },
@@ -996,7 +996,7 @@ await prisma.codeTemplate.create({
         println!("Factorial of 5 is: {}", factorial(5));
       }`,
         file_name: "factorial.rs",
-        language: "Rust",
+        language: "rust",
         isFork: true,
         originalId: 12,
         tags: { connect: [{ id: 4 }, { id: 12 }, { id: 19 }, { id: 10 }] },
@@ -1014,8 +1014,8 @@ name: string;
 }
 const user: User = { id: 1, name: "Ethan" };
 console.log(user);`,
-        file_name: "interface_example.ts",
-        language: "TypeScript",
+        file_name: "interface_example.php",
+        language: "php",
         isFork: true,
         originalId: 26,
         tags: { connect: [{ id: 8 }, { id: 14 }, { id: 17 }, { id: 7 }] },
@@ -1030,7 +1030,7 @@ await prisma.codeTemplate.createMany({
             explanation: "Read and print file contents in Ruby",
             code: `File.open("example.txt").each { |line| puts line }`,
             file_name: "read_file.rb",
-            language: "Ruby",
+            language: "ruby",
         },
         {
             title: "Dictionary in Swift",
@@ -1039,7 +1039,7 @@ await prisma.codeTemplate.createMany({
             code: `var capitals: [String: String] = ["Canada": "Ottawa", "Japan": "Tokyo"]
         print(capitals["Canada"] ?? "Unknown")`,
             file_name: "dictionary.swift",
-            language: "Swift",
+            language: "swift",
         },
         {
             title: "Factorial Calculation in Go",
@@ -1058,7 +1058,7 @@ await prisma.codeTemplate.createMany({
         fmt.Printf("Factorial of %d is %d\\n", number, factorial(number))
         }`,
             file_name: "factorial.go",
-            language: "Go",
+            language: "go",
         },
         {
             title: "Matrix Multiplication in Rust",
@@ -1082,7 +1082,7 @@ await prisma.codeTemplate.createMany({
         println!("Resulting matrix: {:?}", result);
         }`,
             file_name: "matrix_multiplication.rs",
-            language: "Rust",
+            language: "rust",
         },
         {
             title: "Array Sorting in TypeScript",
@@ -1101,8 +1101,8 @@ await prisma.codeTemplate.createMany({
         };
         const numbers = [64, 34, 25, 12, 22, 11, 90];
         console.log("Sorted Array:", bubbleSort(numbers));`,
-            file_name: "bubble_sort.ts",
-            language: "TypeScript",
+            file_name: "bubble_sort.php",
+            language: "php",
         },
 ]});
     

@@ -14,8 +14,6 @@ import CommentForm from '@/components/blog/CommentForm';
 import EllipsisDropdownButton from "@/components/buttons/EllipsisDropdownButton";
 import { COMMENT_LIMIT } from "@/constants";
 
-const validSortOrders = ["asc", "desc"] as const;
-const validSortByFields = ["createdAt", "updatedAt", "upvoteCount", "downvoteCount"] as const;
 
 interface Author {
   id: number;
@@ -71,8 +69,6 @@ const BlogPostDetail = () => {
   const [error, setError] = useState<string>("");
   const [showReportForm, setShowReportForm] = useState(false);
   const [showCommentForm, setShowCommentForm] = useState(false);
-  const [sortBy, setSortBy] = useState<string>("upvoteCount");
-  const [sortOrder, setSortOrder] = useState<string>("desc");
    
   const handleOpenReportForm = async () => {
     setShowReportForm(true);  
@@ -91,8 +87,8 @@ const BlogPostDetail = () => {
   };
 
   const handleUpdate = () => {
-    console.log("Update blog post logic here!");
-  }; //TODO
+    router.push(`/blog/${id}/edit`);
+  };
 
   const handleDelete = async () => {
     if (confirm("Are you sure you want to delete this blog post?")) {
@@ -144,23 +140,6 @@ const BlogPostDetail = () => {
   };
 };
 
-  const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    if (name === "sortBy") {
-      setSortBy(value);
-      router.push({
-        pathname: `/blog`,
-        query: { ...router.query, sortBy: value },
-      });
-    }
-    if (name === "sortOrder") {
-      setSortOrder(value);
-      router.push({
-        pathname: `/blog/${id}`,
-        query: { ...router.query, sortOrder: value },
-      });
-    }
-  };
 
   const handleCommentSubmit = async (content: string, postId: number, parentId?: number) => {
     try {
@@ -394,7 +373,7 @@ const BlogPostDetail = () => {
   };
 
   return (
-    <div className="blog-post-detail bg-gray-900 text-white min-h-screen p-6">
+    <div className="blog-post-detail">
       <div className="flex items-center justify-between">
         <h1>{post.title}</h1>
         {userId === post.author.id && 
@@ -435,7 +414,7 @@ const BlogPostDetail = () => {
         <ul>
           {post.templates.map((template) => (
             <li key={template.id}>
-              <Link href={`/template/${template.id}`}> {/* TODO: Update with correct template link */}
+              <Link href={`/ViewTemplate/${template.id}`}> 
                 {template.title}
               </Link>
             </li>
@@ -465,39 +444,7 @@ const BlogPostDetail = () => {
          {showCommentForm && (
            <CommentForm postId={post.id} onClose={handleCloseCommentForm} onSubmit={handleCommentSubmit} />
          )}
-         <div className="flex space-x-4 mb-4">
-        <select
-          name="sortBy"
-          value={sortBy}
-          onChange={handleSortChange}
-          className="p-2 border rounded-md bg-white shadow text-gray-900"
-        >
-          <option disabled value="">
-            Sort by
-          </option>
-          {validSortByFields.map((field) => (
-            <option key={field} value={field}>
-              {field.charAt(0).toUpperCase() + field.slice(1)}
-            </option>
-          ))}
-        </select>
-
-        <select
-          name="sortOrder"
-          value={sortOrder}
-          onChange={handleSortChange}
-          className="p-2 border rounded-md bg-white shadow text-gray-900"
-        >
-          <option disabled value="">
-            Order
-          </option>
-          {validSortOrders.map((order) => (
-            <option key={order} value={order}>
-              {order.toUpperCase()}
-            </option>
-          ))}
-        </select>
-      </div>
+         
       {commentData.comments.length === 0 ? (
         <NoComments />
       ) : (

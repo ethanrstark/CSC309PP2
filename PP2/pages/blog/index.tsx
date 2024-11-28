@@ -6,6 +6,8 @@ import Pagination from "@/components/Pagination";
 import { BLOG_POST_LIMIT } from "@/constants";
 import NoBlogPosts from "@/components/errors/NoBlogPosts";
 import { validSortByFields, validSortOrders } from "@/constants";
+import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import SearchForm from "@/components/forms/SearchForm";
 
 // Type for the Author
 interface BlogPostAuthor {
@@ -59,6 +61,7 @@ const BlogPostList = () => {
   const [error, setError] = useState<string>("");
   const [sortBy, setSortBy] = useState<string>("upvoteCount");
   const [sortOrder, setSortOrder] = useState<string>("desc");
+  const [showSearchForm, setShowSearchForm] = useState<boolean>(false);
 
   const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -78,36 +81,73 @@ const BlogPostList = () => {
     }
   };
 
-  useEffect(() => {
-    const fetchPosts = async () => {
+  const fetchPosts = async () => {
+    setIsLoading(true);
 
-      try {
-        if (!router.isReady) return; // Wait until the router is ready
-        const token = localStorage.getItem("accessToken");
-        const response = 
-        await fetch(
-          `/api/blog?page=${router.query.page || 1}&limit=${router.query.limit || BLOG_POST_LIMIT}&sortBy=${router.query.sortBy || "upvoteCount"}&sortOrder=${router.query.sortOrder || "desc"}&countPosts=true`,
-          {
-            headers: { authorization: `Bearer ${token}` },
-            cache: "no-store",
-          }
-        );
-
-        if (response.ok) {
-          const result = await response.json();
-          setData(result); // Save data
-        } else {
-          throw new Error(`${response.status}: ${response.statusText}`);
-        }
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "An unknown error occurred");
-      } finally {
-        setIsLoading(false); // Stop loading
+    try {
+      const token = localStorage.getItem("accessToken");
+      if (!token) {
+        throw new Error("Missing authorization token");
       }
-    };
 
+      // Build base API endpoint
+      let endpoint = `/api/blog`;
+      const queryParams: Record<string, string> = {
+        page: (router.query.page as string) || "1",
+        limit: (router.query.limit as string) || BLOG_POST_LIMIT.toString(),
+        sortBy: (router.query.sortBy as string) || "upvoteCount",
+        sortOrder: (router.query.sortOrder as string) || "desc",
+        countPosts: "true",
+      };
+
+      // Add search parameters if they exist
+        queryParams.title = encodeURIComponent(router.query.title as string || "");
+        queryParams.description = encodeURIComponent(router.query.description as string || "");
+        queryParams.tags = encodeURIComponent(router.query.tags as string || "");
+        queryParams.templates = encodeURIComponent(router.query.templates as string || "");
+
+      // Construct full query string
+      const queryString = Object.entries(queryParams)
+        .map(([key, value]) => `${key}=${value}`)
+        .join("&");
+
+      const response = await fetch(`${endpoint}?${queryString}`, {
+        headers: { authorization: `Bearer ${token}` },
+        cache: "no-store",
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setData(result);
+      } else {
+        throw new Error(`${response.status}: ${response.statusText}`);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An unknown error occurred");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!router.isReady) return; // Wait until the router is ready
     fetchPosts();
   }, [router.isReady, router.query]);
+
+  const handleSearchSubmit = () => {
+    // You can handle any additional logic here, like updating state or UI
+
+    // Example: Set the page to the first page of the results after searching
+    if (router.query.page !== "1") {
+      router.push({
+        pathname: "/blog",
+        query: { ...router.query, page: "1" }, // Reset to first page after search
+      });
+    }
+
+    // Optionally fetch data again based on search criteria
+    fetchPosts();
+  };
 
   // If loading, show a spinner or placeholder
   if (isLoading) {
@@ -126,7 +166,7 @@ const BlogPostList = () => {
 
   // If there's data, render the blog posts
   return (
-    <div className="blog-post-list bg-gray-900 text-white min-h-screen p-6">
+    <div className="blog-post-list">
       <h2>Blog Posts</h2>
       <div className="flex space-x-4 mb-4">
         <select
@@ -160,25 +200,34 @@ const BlogPostList = () => {
             </option>
           ))}
         </select>
+        <button className="hover:gray-500" onClick={() => setShowSearchForm(true)}>
+          <MagnifyingGlassIcon className="h-6 w-6 text-gray-900" />
+        </button>
       </div>
-      {data.blogPosts.map((post) => (
-        <BlogPostCard
-          key={post.id}
-          id={post.id}
-          title={post.title}
-          description={post.description}
-          authorId={post.author.id}
-          authorUsername={post.author.userName}
-          authorAvatarUrl={post.author.avatar}
-          createdAt={post.createdAt}
-          upvoteCount={post.upvoteCount}
-          downvoteCount={post.downvoteCount}
-          tags={post.tags.map((tag) => tag.name)}
-        />
-      ))}
-      <Pagination
+      {showSearchForm && <SearchForm handleSearchSubmit={handleSearchSubmit} onClose={() => setShowSearchForm(false)} />}
+      {data.blogPosts.length > 0 ? (
+  data.blogPosts.map((post) => (
+    <BlogPostCard
+      key={post.id}
+      id={post.id}
+      title={post.title}
+      description={post.description}
+      authorId={post.author.id}
+      authorUsername={post.author.userName}
+      authorAvatarUrl={post.author.avatar}
+      createdAt={post.createdAt}
+      upvoteCount={post.upvoteCount}
+      downvoteCount={post.downvoteCount}
+      tags={post.tags.map((tag) => tag.name)}
+    />
+  ))
+) : (
+  <NoBlogPosts />
+)}
+
+          <Pagination
         currentPage={router.query.page ? parseInt(router.query.page as string) : 1}
-        totalPages={Math.ceil(data.postCount / (router.query.limit ? parseInt(router.query.limit as string) : BLOG_POST_LIMIT))}
+        totalPages={Math.ceil(data.postCount / BLOG_POST_LIMIT)}
         onPageChange={(page: number) =>
           router.push({
             pathname: "/blog",
