@@ -65,7 +65,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     let dockerImage = '';
     let dockerCommand = '';
     const memoryLimit = '512m';
-    const timeLimit = '5s';
+    const timeLimit = '10s';
 
 
 
