@@ -214,7 +214,7 @@ const SaveEditTemplate: React.FC<Props>=({code,forkedTemplateId, editTemplateId,
     return (
 <div className="relative">
   <button
-    className="text-gray-300 hover:text-gray-400 flex items-center space-x-2 rounded-lg border-2 border-gray-600 px-4 py-2 bg-gray-800 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-600 absolute top-4 right-4"
+    className="text-gray-300 hover:text-gray-400 flex items-center space-x-2 rounded-lg border-2 border-gray-600 px-4 py-2 bg-gray-800 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-600 fixed top-4 right-4 z-50"
     onClick={(e) => {
       handleAuthen();
 
