@@ -204,6 +204,7 @@ console.log(res)
           upvoteCount={post.upvoteCount}
           downvoteCount={post.downvoteCount}
           tags={post.tags && Array.isArray(post.tags) ? post.tags.map((tag) => tag.name) : []}
+          isHidden={true}
         />
       ))):(
         <span className="text-grey-500">No Tags</span>

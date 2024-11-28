@@ -118,6 +118,7 @@ const UserBlogPostList = () => {
           upvoteCount={post.upvoteCount}
           downvoteCount={post.downvoteCount}
           tags={post.tags.map((tag) => tag.name)}
+          isHidden={false}
         />
       ))}
 
