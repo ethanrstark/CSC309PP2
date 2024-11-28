@@ -1,9 +1,12 @@
 import { useState,useEffect } from 'react';
-
+import { jwtDecode } from 'jwt-decode';
 import Link from 'next/link';
 import SignOutButton from "@/components/SignOutButton";
+import { UserPayload } from '@/constants';
+
 const Sidebar: React.FC = () => {
-    const [isLoggedIn, setIsLoggedIn]=useState<boolean>(false)
+    const [isLoggedIn, setIsLoggedIn]=useState<boolean>(false);
+    const [userId, setUserId]=useState<number>(0);
 
     useEffect(() =>{
         const accessToken = localStorage.getItem("accessToken");
@@ -11,6 +14,8 @@ const Sidebar: React.FC = () => {
     
         if (accessToken && refreshToken) {
           setIsLoggedIn(true)
+          const decodedToken: UserPayload = jwtDecode(accessToken);
+          setUserId(decodedToken.id);
           //setUserAvatar()
       }},[])
 
@@ -51,12 +56,18 @@ const Sidebar: React.FC = () => {
                     All Templates
                 </Link>
 
-                <Link href="/editor" className="block px-4 py-2 hover:bg-gray-700">
-                    Code Editor
+                {isLoggedIn && (
+                <Link href={`/user/blog/${userId}`} className="block px-4 py-2 hover:bg-gray-700">
+                  My Blog Posts
                 </Link>
+                )}
 
                 <Link href="/blog" className="block px-4 py-2 hover:bg-gray-700">
-                    Blog Posts
+                    All Blog Posts
+                </Link>
+
+                <Link href="/editor" className="block px-4 py-2 hover:bg-gray-700">
+                    Code Editor
                 </Link>
 
                 <Link href="/reports" className="block px-4 py-2 hover:bg-gray-700">

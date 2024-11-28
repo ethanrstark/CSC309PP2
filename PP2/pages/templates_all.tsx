@@ -4,6 +4,7 @@ import Select from 'react-select'; // To handle multi-select for tags
 import { components } from 'react-select';
 import { title } from 'process';
 import Link from "next/link";
+import { CODE_TEMPLATE_LIMIT } from '@/constants';
 // Custom components for react-select to allow for tag creation
 const customSingleValue = ({ data }: any) => <div>{data.label}</div>;
 
@@ -71,7 +72,7 @@ console.log(res)
         //if(data.paged_templates && data.paged_templates.length>0){
        
         setTemplates(data.pagedTemplates)
-        setTotalPages(Math.ceil(parseInt(data.numTemp)/2))
+        setTotalPages(Math.ceil(parseInt(data.numTemp)/CODE_TEMPLATE_LIMIT))
         setNoTemplates(false)
         
    

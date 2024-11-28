@@ -8,6 +8,7 @@ import React, { useState, useEffect , ChangeEvent} from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import Select from 'react-select'; // To handle multi-select for tags
+import { CODE_TEMPLATE_LIMIT } from "@/constants";
 
 const customSingleValue = ({ data }: any) => <div>{data.label}</div>;
 
@@ -164,7 +165,7 @@ export default function My_Templates(){
           const dataTemp=await res.json()
           if(res.status===201){
             setTemplates(dataTemp.pagedTemplates)
-          setTotalPages(Math.ceil(parseInt(dataTemp.numTemp)/2))
+          setTotalPages(Math.ceil(parseInt(dataTemp.numTemp)/CODE_TEMPLATE_LIMIT))
           setNoTemplates(false)
         }else{
           if(page>1){
@@ -183,7 +184,7 @@ export default function My_Templates(){
        else if (res.status===201){ 
        
           setTemplates(data.pagedTemplates)
-        setTotalPages(Math.ceil(parseInt(data.numTemp)/2))
+        setTotalPages(Math.ceil(parseInt(data.numTemp)/CODE_TEMPLATE_LIMIT))
         setNoTemplates(false)
       
     
