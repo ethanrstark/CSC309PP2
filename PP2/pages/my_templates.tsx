@@ -452,6 +452,11 @@ export default function My_Templates(){
           router.push(`/editor?templateId=${templateId}`); // Use router.push to navigate to the editor page
       
   };
+
+  const redirectToDetails = (templateId:number,userName:string)=>{
+    router.push(`/ViewTemplate/${templateId}?userName=${userName}`); // Use router.push to navigate to the view template page
+  
+  }
       return (
        
         <div className="min-h-screen bg-gray-900 text-white">
@@ -557,6 +562,7 @@ export default function My_Templates(){
                     <th className="px-4 py-2 text-left">Last Modified</th>
                     <th className="px-4 py-2 text-left">Tags</th>
                     <th className="px-4 py-2 text-left">Actions</th>
+                    <th className="px-4 py-2 text-left">View Details</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -599,7 +605,7 @@ export default function My_Templates(){
                             <i className="fas fa-play-circle"></i>
                             
                           </button>
-                          
+                         
                           <button
                             className="text-gray-500 hover:text-gray-700 flex items-center space-x-2"
                             onClick={() => {setTemplateDel(template.id); setPopUpOpen(true)}}
@@ -613,7 +619,12 @@ export default function My_Templates(){
                             <i className="fas fa-pencil-alt"></i>
                           </button>
                         </div>
-                      </td>
+                      </td> 
+                      <td className="px-4 py-2 text-center">
+                  <button className="text-green-500 hover:text-green-700" onClick={()=>redirectToDetails(template.id,template.user.userName)}>
+                  <i className="fas fa-solid fa-list"></i>
+                  </button>
+                </td>
                     </tr>
                   ))}
                 </tbody>

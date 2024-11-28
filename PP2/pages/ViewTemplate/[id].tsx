@@ -140,8 +140,14 @@ console.log(res)
       );
     }
     const redirectToEditor = (templateId:number) => {
+        if(router.query.userName){
+            router.push(`/editor?templateId=${templateId}`); // Use router.push to navigate to the editor page
+
+        }else{
+                    router.push(`/editor?forkedId=${templateId}`); // Use router.push to navigate to the editor page
+
+        }
       
-        router.push(`/editor?forkedId=${templateId}`); // Use router.push to navigate to the editor page
       
       };
     return (

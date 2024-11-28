@@ -174,6 +174,11 @@ const redirectToEditor = (templateId:number) => {
   router.push(`/editor?forkedId=${templateId}`); // Use router.push to navigate to the editor page
 
 };
+
+const redirectToDetails = (templateId:number)=>{
+  router.push(`/ViewTemplate/${templateId}`); // Use router.push to navigate to the view template page
+
+}
   return (
    
     <div className="min-h-screen bg-gray-900 text-white">
@@ -279,6 +284,7 @@ const redirectToEditor = (templateId:number) => {
               <th className="px-4 py-2 text-left">Last Modified</th>
               <th className="px-4 py-2 text-left">Tags</th>
               <th className="px-4 py-2 text-left">Actions</th>
+              <th className="px-4 py-2 text-left">View Details</th>
             </tr>
           </thead>
           <tbody>
@@ -308,6 +314,11 @@ const redirectToEditor = (templateId:number) => {
                 <td className="px-4 py-2 text-center">
                   <button className="text-green-500 hover:text-green-700" onClick={()=>redirectToEditor(template.id)}>
                     <i className="fas fa-play-circle"></i> {/* Play icon */}
+                  </button>
+                </td>
+                <td className="px-4 py-2 text-center">
+                  <button className="text-green-500 hover:text-green-700" onClick={()=>redirectToDetails(template.id)}>
+                  <i className="fas fa-solid fa-list"></i>
                   </button>
                 </td>
               </tr>
