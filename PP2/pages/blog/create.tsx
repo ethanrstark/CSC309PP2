@@ -52,7 +52,7 @@ export default function CreateBlogPostPage() {
   }
 
   return (
-    <div className="p-6">
+    <div className="p-6 bg-gray-900 text-white min-h-screen ">
         <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={() => setShowCreateForm(true)}> Create </button>
       {showCreateForm && <CreateBlogPostForm availableTags={tags} availableTemplates={templates} closeForm={handleCloseReportForm} />}
     </div>

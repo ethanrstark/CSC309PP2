@@ -394,7 +394,7 @@ const BlogPostDetail = () => {
   };
 
   return (
-    <div className="blog-post-detail">
+    <div className="blog-post-detail bg-gray-900 text-white min-h-screen p-6">
       <div className="flex items-center justify-between">
         <h1>{post.title}</h1>
         {userId === post.author.id && 
