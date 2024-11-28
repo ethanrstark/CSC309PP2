@@ -465,9 +465,7 @@ export default function My_Templates(){
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
           rel="stylesheet"
         />
-      <div className="absolute top-4 left-4 text-white text-2xl ">
-  <Link href="/">Home</Link>
-</div>
+      
   
         <div className="container mx-auto px-4 py-6">
           <div className="flex mb-4">

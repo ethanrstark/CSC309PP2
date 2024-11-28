@@ -187,9 +187,7 @@ const redirectToDetails = (templateId:number)=>{
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
       rel="stylesheet"
     />
-      <div className="absolute top-4 left-4 text-white text-2xl ">
-  <Link href="/">Home</Link>
-</div>
+    
     {/* Search Bar Section */}
     <div className="container mx-auto px-4 py-6 flex flex-wrap mb-4">
       {/* Search by Title */}

@@ -203,25 +203,35 @@ console.log(res)
           <div className="blog-post-list">
       <h2>Blog Posts</h2>
       {blogPosts.length>0 ? (
-        blogPosts.map((post) => (
-        <BlogPostCard
-          key={post.id}
-          id={post.id}
-          title={post.title}
-          description={post.description}
-          authorId={post.author.id}
-          authorUsername={post.author.userName}
-          authorAvatarUrl={post.author.avatar}
-          createdAt={post.createdAt}
-          upvoteCount={post.upvoteCount}
-          downvoteCount={post.downvoteCount}
-          tags={post.tags && Array.isArray(post.tags) ? post.tags.map((tag) => tag.name) : []}
-          isHidden={post.isHidden}
-          hiddenReason={post.hiddenReason}
-        />
-      ))):(
-        <span className="text-grey-500">No Tags</span>
-      )}
+        blogPosts.map((post) => {
+            // Check if post is not hidden
+            if (post.isHidden === false) {
+              return (
+                <BlogPostCard
+                  key={post.id}
+                  id={post.id}
+                  title={post.title}
+                  description={post.description}
+                  authorId={post.author.id}
+                  authorUsername={post.author.userName}
+                  authorAvatarUrl={post.author.avatar}
+                  createdAt={post.createdAt}
+                  upvoteCount={post.upvoteCount}
+                  downvoteCount={post.downvoteCount}
+                  tags={post.tags && Array.isArray(post.tags) ? post.tags.map((tag) => tag.name) : []}
+                  isHidden={post.isHidden}
+                  hiddenReason={post.hiddenReason}
+                />
+              );
+            }
+        
+            // Optionally, you can render something else if the post is hidden, 
+            // or just return null to skip the post from rendering
+            return null; 
+          })
+        ) : (
+          <span className="text-grey-500">No Tags</span>
+        )}
 
   </div>
           {/* Pagination Controls */}

@@ -294,9 +294,7 @@ const EditProfilePage: React.FC<FormProps>=()=>{
     return (
       <div className="min-h-screen flex justify-center items-center p-6 bg-gray-900">
   <div className="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md">
-  <div className="absolute top-4 left-4 text-white text-2xl ">
-  <Link href="/">Home</Link>
-</div>
+  
     <h2 className="text-2xl font-bold text-center mb-6 text-white">Edit Profile</h2>
     
     <form onSubmit={handleSubmit}>
