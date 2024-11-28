@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import Sidebar from './../components/sidebar/SideBar';
+import Sidebar from './../components/sidebar/Sidebar';
+import Image from 'next/image';
+import logo from '../public/logo.jpg';
 
 export default function Home() {
   const [sidebarVisible, setSidebarVisible] = useState(true);
@@ -33,7 +35,10 @@ export default function Home() {
         </button>
         <div className="justify-center text-center">
           <h1 className="text-2xl font-bold mb-4">Home Page</h1>
-          <p>Welcome to Scriptorium!</p>
+          <div className="flex flex-row justify-center items-center space-x-4">
+            <h1>Welcome to Scriptorium!</h1>
+            <Image src={logo} alt="Logo" className="h-12 w-12 rounded-lg"/>
+          </div>
 
         </div>
 

@@ -14,21 +14,24 @@ const Sidebar: React.FC = () => {
         >
 
             <div className="mt-2">
-              <Link href="/login" className="block px-4 py-2 hover:bg-gray-700">
-                Login
-              </Link>
-              <Link href="/my_templates" className="block px-4 py-2 hover:bg-gray-700">
-                My Templates
-              </Link>
-              <Link href="/templates_all" className="block px-4 py-2 hover:bg-gray-700">
-                All Templates
-              </Link>
-              <Link href="/editor" className="block px-4 py-2 hover:bg-gray-700">
-                Code Editor
-              </Link>
-              <Link href="/blog" className="block px-4 py-2 hover:bg-gray-700">
-                Blog Posts
-              </Link>
+                <Link href="/" className="block px-4 py-2 hover:bg-gray-700">
+                    Home
+                </Link>
+                <Link href="/login" className="block px-4 py-2 hover:bg-gray-700">
+                    Login
+                </Link>
+                <Link href="/my_templates" className="block px-4 py-2 hover:bg-gray-700">
+                    My Templates
+                </Link>
+                <Link href="/templates_all" className="block px-4 py-2 hover:bg-gray-700">
+                    All Templates
+                </Link>
+                <Link href="/editor" className="block px-4 py-2 hover:bg-gray-700">
+                    Code Editor
+                </Link>
+                <Link href="/blog" className="block px-4 py-2 hover:bg-gray-700">
+                    Blog Posts
+                </Link>
             </div>
         </nav>
        
