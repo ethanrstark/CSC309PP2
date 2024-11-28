@@ -94,7 +94,7 @@ const ReportForm: React.FC<ReportFormProps> = ({ targetId, targetType, onClose }
       >
         {/* Header */}
         <div className="flex justify-between items-center">
-          <h2 className="text-xl font-semibold text-gray-800">
+          <h2 className="text-2xl font-semibold text-gray-800">
             Report {targetType.charAt(0).toUpperCase() + targetType.slice(1)}
           </h2>
           <button
@@ -102,12 +102,12 @@ const ReportForm: React.FC<ReportFormProps> = ({ targetId, targetType, onClose }
             onClick={onClose}
             className="text-gray-400 hover:text-red-500 transition"
           >
-            <XMarkIcon className="h-6 w-6" />
+            <XMarkIcon className="h-8 w-8" />
           </button>
         </div>
 
         {/* Warning */}
-        <p className="text-sm text-gray-600">
+        <p className="text-md text-gray-600">
           Ensure you are logged in before submitting the report. If redirected to the login page, your report data will be lost.
         </p>
 
@@ -115,9 +115,9 @@ const ReportForm: React.FC<ReportFormProps> = ({ targetId, targetType, onClose }
         <div>
           <label
             htmlFor="reason"
-            className="block text-sm font-medium text-gray-700 mb-2"
+            className="block text-md font-medium text-gray-700 mb-2"
           >
-            Report Details
+            Report Details:
           </label>
           <textarea
             id="reason"
@@ -125,12 +125,12 @@ const ReportForm: React.FC<ReportFormProps> = ({ targetId, targetType, onClose }
             onChange={(e) => setReason(e.target.value)}
             required
             placeholder="Provide details about the issue..."
-            className="w-full h-28 border border-gray-300 rounded-lg p-3 focus:ring-blue-500 focus:border-blue-500 text-sm text-gray-700"
+            className="w-full h-28 border border-gray-300 rounded-lg p-3 focus:ring-blue-500 focus:border-blue-500 text-md text-gray-700"
           />
         </div>
 
         {/* Actions */}
-        <div className="flex justify-end space-x-3">
+        <div className="flex justify-center space-x-3">
           <button
             type="submit"
             className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"

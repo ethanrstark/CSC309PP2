@@ -20,6 +20,8 @@ interface Tag {
 }
 
 interface BlogPost {
+  isHidden: boolean;
+  hiddenReason: string | undefined;
   id: number;
   title: string;
   description: string;
@@ -204,7 +206,8 @@ console.log(res)
           upvoteCount={post.upvoteCount}
           downvoteCount={post.downvoteCount}
           tags={post.tags && Array.isArray(post.tags) ? post.tags.map((tag) => tag.name) : []}
-          isHidden={true}
+          isHidden={post.isHidden}
+          hiddenReason={post.hiddenReason}
         />
       ))):(
         <span className="text-grey-500">No Tags</span>

@@ -5,6 +5,8 @@ import BlogPostCard from "@/components/blog/BlogPostCard";
 import Pagination from "@/components/Pagination";
 import NoBlogPosts from "@/components/errors/NoBlogPosts";
 import { BLOG_POST_LIMIT } from "@/constants";
+import { UserPayload } from "@/constants";
+import { jwtDecode } from "jwt-decode";
 
 // Type for the Author
 interface BlogPostAuthor {
@@ -50,20 +52,60 @@ interface BlogPostAuthor {
     postCount: number; // Total number of posts
   }
 
-const UserBlogPostList = () => {
+const myPosts = () => {
   const router = useRouter();
   const [data, setData] = useState<BlogPostListResponse>({blogPosts: [], postCount: 0});
-  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
+  const [userId, setUserId]=useState<number>(0);
+
+  const handleAuthen = async () => {
+    try {
+      const response = await fetch('/api/token/isUserAuth', {
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+        cache: 'no-store',
+      });
+  
+      if (response.ok) {
+        const data = await response.json();
+        setUserId(data.id);
+      } else {
+        const refreshResp = await fetch('/api/User/Refresh', {
+          method: 'GET',
+          headers: {
+            authorization: `Bearer ${localStorage.getItem("refreshToken")}`,
+          },
+          cache: 'no-store',
+        });
+  
+        if (refreshResp.ok) {
+          const data = await refreshResp.json();
+          sessionStorage.setItem("accessToken", data.accessToken);
+        } else {
+          router.push('/login');
+        }
+      }
+    } catch (err: any) {
+      console.error(err);
+    }
+  };
 
   useEffect(() => {
-    const fetchPosts = async () => {
+    if (!router.isReady) return;
+    handleAuthen();
+  }, [router.isReady]);
+  
+  useEffect(() => {
+    if (userId === 0) return;
+    if (!router.isReady) return; // Wait until the router is ready
 
+    const fetchPosts = async () => {
       try {
-        if (!router.isReady) return; // Wait until the router is ready
         const response = 
         await fetch(
-          `/api/blog/user?page=${router.query.page || 1}&limit=${router.query.limit || BLOG_POST_LIMIT}&sortBy=${router.query.sortBy || "upvoteCount"}&sortOrder=${router.query.sortOrder || "desc"}&countPosts=true&userId=${router.query.userId}`,
+          `/api/blog/user?userId=${userId}&page=${router.query.page || 1}&limit=${router.query.limit || BLOG_POST_LIMIT}&sortBy=${router.query.sortBy || "upvoteCount"}&sortOrder=${router.query.sortOrder || "desc"}&countPosts=true`,
           {
             cache: "no-store",
           }
@@ -78,18 +120,13 @@ const UserBlogPostList = () => {
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : "An unknown error occurred");
-      } finally {
-        setIsLoading(false); // Stop loading
-      }
+      } 
     };
 
     fetchPosts();
-  }, [router.isReady, router.query]);
+  }, [userId, router.query]);
+  
 
-  // If loading, show a spinner or placeholder
-  if (isLoading ) {
-    return <p>Loading...</p>;
-  }
 
   // If there was an error, show an error message
   if (error) {
@@ -118,7 +155,8 @@ const UserBlogPostList = () => {
           upvoteCount={post.upvoteCount}
           downvoteCount={post.downvoteCount}
           tags={post.tags.map((tag) => tag.name)}
-          isHidden={false}
+          isHidden={post.isHidden}
+          hiddenReason={post.hiddenReason}
         />
       ))}
 
@@ -127,7 +165,7 @@ const UserBlogPostList = () => {
         totalPages={Math.ceil(data.postCount / (router.query.limit ? parseInt(router.query.limit as string) : BLOG_POST_LIMIT))}
         onPageChange={(page: number) =>
           router.push({
-            pathname: `/user/blog/${router.query.userId}`,
+            pathname: `/blog/myPosts`,
             query: { ...router.query , page },
           })
         }
@@ -136,4 +174,4 @@ const UserBlogPostList = () => {
   );
 };
 
-export default UserBlogPostList;
+export default myPosts;

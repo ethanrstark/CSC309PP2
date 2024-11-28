@@ -58,15 +58,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     ];
 
     try {
-        let postCount;
-        let blogPosts;
         // Get the total number of posts that user with userId authored if requested (else set to -1)
-        postCount = countPosts === "true"
+        const postCount = countPosts === "true"
             ? await prisma.blogPost.count({ where: { authorId: parseInt(req.query.userId as string, 10) } })
             : -1;
 
         // Retrieve blog posts that user with userId has authored
-        blogPosts = await prisma.blogPost.findMany({
+        const blogPosts = await prisma.blogPost.findMany({
             where: { authorId: parseInt(req.query.userId as string, 10) },
             include: {
                 author: {

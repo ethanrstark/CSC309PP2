@@ -1,26 +1,30 @@
 // pages/blog/[id].tsx
+
 import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 import { jwtDecode } from 'jwt-decode';
 import { ChatBubbleLeftEllipsisIcon, FlagIcon } from '@heroicons/react/24/outline';
-import Pagination from "@/components/Pagination";
-import UserAvatar from '@/components/blog/UserAvatar';
+
+import Pagination from '@/components/Pagination';
+import UserAvatar from '@/components/blog/BlogAvatar';
 import ReportForm from '@/components/forms/ReportForm';
 import CommentCard from '@/components/blog/CommentCard';
 import NoComments from '@/components/errors/NoComments';
+import NoBlogPosts from '@/components/errors/NoBlogPosts';
 import RatingForm from '@/components/forms/RatingForm';
 import CommentForm from '@/components/blog/CommentForm';
-import EllipsisDropdownButton from "@/components/buttons/EllipsisDropdownButton";
-import { COMMENT_LIMIT } from "@/constants";
+import EllipsisDropdownButton from '@/components/buttons/EllipsisDropdownButton';
 
+import { COMMENT_LIMIT } from '@/constants';
 
+// Interfaces
 interface Author {
   id: number;
   userName: string;
   avatar: string;
   role: string;
-};
+}
 
 interface BlogPost {
   id: number;
@@ -46,50 +50,38 @@ interface Comment {
   author: Author;
   upvoteCount: number;
   downvoteCount: number;
-} // TODO maybe add indent level?
-
-// Type for the Comment API Response
-interface CommentResponse {
-  comments: Comment[]; // List of comments
-  commentCount: number; // Total number of comments
+  isHidden: boolean;
+  hiddenReason?: string;
 }
 
+interface CommentResponse {
+  comments: Comment[];
+  commentCount: number;
+}
 
+// Component
 const BlogPostDetail = () => {
   const router = useRouter();
   const { id } = router.query;
-  
+
+  // State Management
   const [post, setPost] = useState<BlogPost | null>(null);
   const [userId, setUserId] = useState<number | null>(null);
   const [userVote, setUserVote] = useState<"upvote" | "downvote" | null>(null);
   const [commentData, setCommentData] = useState<CommentResponse>({ comments: [], commentCount: 0 });
   const [upvoteTotal, setUpvoteTotal] = useState<number>(0);
   const [downvoteTotal, setDownvoteTotal] = useState<number>(0);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
   const [showReportForm, setShowReportForm] = useState(false);
   const [showCommentForm, setShowCommentForm] = useState(false);
-   
-  const handleOpenReportForm = async () => {
-    setShowReportForm(true);  
-  };
 
-  const handleCloseReportForm = () => {
-    setShowReportForm(false);
-  };
+  // Handlers
+  const handleOpenReportForm = () => setShowReportForm(true);
+  const handleCloseReportForm = () => setShowReportForm(false);
+  const handleOpenCommentForm = () => setShowCommentForm(true);
+  const handleCloseCommentForm = () => setShowCommentForm(false);
 
-  const handleOpenCommentForm = async () => {
-    setShowCommentForm(true);  
-  };
-
-  const handleCloseCommentForm = () => {
-    setShowCommentForm(false);
-  };
-
-  const handleUpdate = () => {
-    router.push(`/blog/${id}/edit`);
-  };
-
+  const handleUpdate = () => router.push(`/blog/${id}/edit`); // TODO
   const handleDelete = async () => {
     if (confirm("Are you sure you want to delete this blog post?")) {
       try {
@@ -119,7 +111,7 @@ const BlogPostDetail = () => {
               router.push('/login');
               return;
             } else if (retriedResponse.ok) {
-              router.push(`/blog`);
+              router.push("/blog");
               return;
             } else {
               throw new Error(`${retriedResponse.status}: ${retriedResponse.statusText}`);
@@ -129,7 +121,7 @@ const BlogPostDetail = () => {
             return;
           }
         } else if (response.ok) {
-          router.push(`/blog`);
+          router.push("/blog");
           return;
         } else {
           throw new Error(`${response.status}: ${response.statusText}`);
@@ -141,18 +133,71 @@ const BlogPostDetail = () => {
 };
 
 
+  const handleVote = async (votedYet: boolean, newVote: "upvote" | "downvote") => {
+    try {
+      const method = votedYet ? 'PUT' : 'POST';
+      const response = await fetch(`/api/blog/${id}/rate`, {
+        method,
+        headers: {
+          authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ isUpvote: newVote === 'upvote' }),
+      });
+
+      if (response.status === 401 || response.status === 403) {
+        const refreshResp = await fetch('/api/User/Refresh', {
+          headers: { authorization: `Bearer ${localStorage.getItem('refreshToken')}` },
+        });
+
+        if (refreshResp.ok) {
+          const data = await refreshResp.json();
+          localStorage.setItem('accessToken', data.accessToken);
+          const retriedResponse = await fetch(`/api/blog/${id}/rate`, {
+            method,
+            headers: {
+              authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ isUpvote: newVote === 'upvote' }),
+          });
+          if (retriedResponse.status === 401 || retriedResponse.status === 403) {
+            router.push('/login');
+            return;
+          } else if (retriedResponse.ok) {
+            setUserVote(newVote);
+            updateVoteCount(votedYet, newVote);
+            router.push({pathname: `/blog/${id}`, query: router.query});
+            return;
+          } else {
+            throw new Error(`${retriedResponse.status}: ${retriedResponse.statusText}`);
+          }
+        } else {
+          router.push('/login');
+          return;
+        }
+      } else if (response.ok) {
+        setUserVote(newVote);
+        updateVoteCount(votedYet, newVote);
+        router.push({pathname: `/blog/${id}`, query: router.query});
+        return;
+      } else {
+        throw new Error(`${response.status}: ${response.statusText}`);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An unknown error occurred");
+    }
+  };
+
   const handleCommentSubmit = async (content: string, postId: number, parentId?: number) => {
     try {
       const response = await fetch(`/api/blog/${postId}/comments/create`, {
         method: 'POST',
         headers: {
           authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-          "Content-Type": 'application/json',
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          content,
-          parentId,
-        }),
+        body: JSON.stringify({ content, parentId }),
       });
 
       if (response.status === 401 || response.status === 403) {
@@ -169,10 +214,7 @@ const BlogPostDetail = () => {
               authorization: `Bearer ${localStorage.getItem('accessToken')}`,
               "Content-Type": 'application/json',
             },
-            body: JSON.stringify({
-              content,
-              parentId,
-            }),
+            body: JSON.stringify({ content, parentId }),
           });
 
           if (retriedResponse.status === 401 || retriedResponse.status === 403) {
@@ -199,178 +241,76 @@ const BlogPostDetail = () => {
     }
   };
 
-  useEffect(() => {
-    if (id) {
-      const fetchData = async () => {
-        setIsLoading(true); // Start loading
-        setError(""); // Reset error state
-  
-        try {
-          if (!router.isReady) return; // Wait until the router is ready
-          
-          // Check if the user is logged in
-          const token = localStorage.getItem("accessToken");
-          if (token !== null) {
-            try {
-              const decodedToken = jwtDecode<{ id: number }>(token);
-              setUserId(decodedToken.id); // Save the userId from the decoded token
-            } catch (error) {
-              throw new Error("Invalid access token");
-            }
-          }
-          // Fetch multiple endpoints concurrently
-          const [postResponse, voteResponse, commentsResponse] = await Promise.all([
-            fetch(`/api/blog/${id}`, {cache: "no-store"}),  // Fetch blog post
-            fetch(`/api/blog/${id}/userRated`, 
-              {
-                headers: { authorization: `Bearer ${token}` },
-                cache: "no-store",
-              }
-            ), // Fetch the user's vote
-            fetch(`/api/blog/${id}/comments?page=${router.query.page || 1}&limit=${router.query.limit || COMMENT_LIMIT}&sortBy=${router.query.sortBy || "upvoteCount"}&sortOrder=${router.query.sortOrder || "desc"}&countComments=true`,
-              {
-                headers: { authorization: `Bearer ${token}` },
-                cache: "no-store",
-              }
-            ), // Fetch comments
-          ]); 
-          // TODO may have to handle token more gracefully
-          
-
-          if (postResponse.ok) {
-            const postData = await postResponse.json();
-            setPost(postData);
-            setUpvoteTotal(postData.upvoteCount);
-            setDownvoteTotal(postData.downvoteCount);
-          } else {
-            throw new Error(`${postResponse.status}: ${postResponse.statusText}`);
-          }
-
-          if (voteResponse.ok) {
-            const voteData = await voteResponse.json();
-            setUserVote(voteData.hasRated ? 
-                      voteData.isUpvote ? "upvote" : "downvote" 
-                      : null);
-          } else {
-            setUserVote(null);
-          }
-
-          if (commentsResponse.ok) {
-            const commentsData = await commentsResponse.json();
-            setCommentData(commentsData);
-          } else {
-            throw new Error(`${commentsResponse.status}: ${commentsResponse.statusText}`);
-          }
-  
-        } catch (err) {
-          setError(err instanceof Error ? err.message : "An unknown error occurred");
-        } finally {
-          setIsLoading(false); // Stop loading
-        }
-      };
-      fetchData();
+  // Vote Count Update
+  const updateVoteCount = (voted: boolean, newVote: "upvote" | "downvote") => {
+    if (newVote === "upvote") {
+      setUpvoteTotal(upvoteTotal + 1);
+      if (voted) setDownvoteTotal(downvoteTotal - 1);
+    } else {
+      setDownvoteTotal(downvoteTotal + 1);
+      if (voted) setUpvoteTotal(upvoteTotal - 1);
     }
-  }, [router.isReady, router.query, id]);
+  };
 
-  // If loading, show a spinner or placeholder
-  if (isLoading) {
-    return <p>Loading...</p>;
-  }
+  // Fetch Blog Details
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!id || !router.isReady) return;
+      try {
+        const token = localStorage.getItem("accessToken");
+        if (token !== null) {
+          const decodedToken = jwtDecode<{ id: number }>(token);
+          setUserId(decodedToken.id);
+        }
+        const [postResponse, voteResponse, commentsResponse] = await Promise.all([
+          fetch(`/api/blog/${id}`),
+          fetch(`/api/blog/${id}/userRated`, { headers: { authorization: `Bearer ${token}` } }),
+          fetch(`/api/blog/${id}/comments?page=${router.query.page || 1}&limit=${COMMENT_LIMIT}&countComments=true`, { headers: { authorization: `Bearer ${token}` }, cache: "no-store" }),
+        ]);
+        
+        if (postResponse.ok) {
+          const postData = await postResponse.json();
+          setPost(postData);
+          setUpvoteTotal(postData.upvoteCount);
+          setDownvoteTotal(postData.downvoteCount);
+        } else {
+          throw new Error(`${postResponse.status}: ${postResponse.statusText}`);
+        }
 
-  // If there was an error, show an error message
-  if (error) {
+        if (voteResponse.ok) {
+          const voteData = await voteResponse.json();
+          setUserVote(voteData.hasRated ? (voteData.isUpvote ? "upvote" : "downvote") : null);
+        } else {
+          setUserVote(null);
+        }
+
+        if (commentsResponse.ok) {
+          const commentsData = await commentsResponse.json();
+          setCommentData(commentsData);
+        } else {
+          throw new Error(`${commentsResponse.status}: ${commentsResponse.statusText}`);
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "An unknown error occurred");
+      }
+    };
+    fetchData();
+  }, [id, router.isReady, router.query]);
+
+
+   // If there was an error, show an error message
+   if (error) {
     alert(`Error ${error}`);
     setError(""); // Reset error state
   }
 
-  if (!post) {
-    return <p>Post not found</p>;
-  }
+  // Render
+  if (!post) return <NoBlogPosts />;
+  if (post.isHidden && (!userId || userId !== post.author.id)) return <NoBlogPosts />;
 
-  if (post.isHidden && (!userId || userId !== post.author.id)) {
-    // TODO add a flag for hiding
-  }
-
-  const dateFormat = new Intl.DateTimeFormat("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    hour: "numeric",
-    minute: "numeric",
-    timeZoneName: "short",
-  });
-  const createdDate = dateFormat.format(new Date(post.createdAt));
-  const updatedDate = dateFormat.format(new Date(post.updatedAt));
-
-  const updateVoteCount = (voted: boolean, newVote: "upvote" | "downvote") => {
-    if (newVote === "upvote") {
-      setUpvoteTotal(upvoteTotal + 1);
-      if (voted) {
-        setDownvoteTotal(downvoteTotal - 1);
-      }
-    } else {
-      setDownvoteTotal(downvoteTotal + 1);
-      if (voted) {
-        setUpvoteTotal(upvoteTotal - 1);
-      }
-    }
-  };
-
-  async function handleVote(votedYet: boolean, newVote: "upvote" | "downvote"): Promise<void> {
-    try {
-      let response;
-      if (votedYet) {
-        response = await fetch(`/api/blog/${id}/rate`, {
-          method: 'PUT',
-          headers: {
-            authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-            "Content-Type": 'application/json',
-          },
-          body: JSON.stringify({
-            isUpvote: newVote === "upvote",
-          }),
-        });
-      } else {
-        response = await fetch(`/api/blog/${id}/rate`, {
-          method: 'POST',
-          headers: {
-            authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-            "Content-Type": 'application/json',
-          },
-          body: JSON.stringify({
-            isUpvote: newVote === "upvote",
-          }),
-        });
-      }
-
-      if (response.status === 401 || response.status === 403) {
-        const refreshResp = await fetch('/api/User/Refresh', {
-          headers: { authorization: `Bearer ${localStorage.getItem('refreshToken')}` },
-        });
-
-        if (refreshResp.ok) {
-          const data = await refreshResp.json();
-          localStorage.setItem('accessToken', data.accessToken);
-          setUserVote(newVote);
-          updateVoteCount(votedYet, newVote);
-          router.push(`/blog/${id}`);
-          return;
-        } else {
-          router.push('/login');
-          return;
-        }
-      } else if (response.ok) {
-        setUserVote(newVote);
-        updateVoteCount(votedYet, newVote);
-        return;
-      } else {
-        throw new Error(`${response.status}: ${response.statusText}`);
-      }
-    } catch (err) {
-        setError(err instanceof Error ? err.message : "An unknown error occurred");
-        return;
-    }
-  };
+  const formattedDate = (date: string) => new Intl.DateTimeFormat("en-US", {
+    year: "numeric", month: "long", day: "numeric", hour: "numeric", minute: "numeric",
+  }).format(new Date(date));
 
   return (
     <div className="blog-post-detail">
@@ -389,15 +329,13 @@ const BlogPostDetail = () => {
       
       <div className="text-sm font-medium">
         <p>Author: {post.author.userName}</p>
-        <p>Upvotes: {post.upvoteCount}</p>
-        <p>Downvotes: {post.downvoteCount}</p>
       </div>
   
       <RatingForm upvoteCount={upvoteTotal} downvoteCount={downvoteTotal} userVote={userVote} onVoteChange={handleVote} />
   
       <div className="mt-4">
-        <p>Created At: {createdDate}</p>
-        <p>Updated At: {updatedDate}</p>
+        <p>Created At: {formattedDate(post.createdAt)}</p>
+        <p>Updated At: {formattedDate(post.updatedAt)}</p>
       </div>
   
       <div className="mt-6">
@@ -462,21 +400,16 @@ const BlogPostDetail = () => {
             upvoteCount={comment.upvoteCount}
             downvoteCount={comment.downvoteCount}
             indentLevel={0}
+            isHidden={comment.isHidden}
+            hiddenReason={comment.hiddenReason}
           />
         ))
       )} 
       <Pagination
         currentPage={router.query.page ? parseInt(router.query.page as string) : 1}
         totalPages={Math.ceil(commentData.commentCount / (router.query.limit ? parseInt(router.query.limit as string) : COMMENT_LIMIT))}
-        onPageChange={(page: number) =>
-          router.push({
-            pathname: `/blog/${id}`,
-            query: { ...router.query, page },
-          })
-        }
+        onPageChange={(page: number) => router.push({ pathname: `/blog/${id}`, query: { ...router.query, page }})}
       />
-      {/* TODO make a setter function which handles indent level by show replies button */}
-      {/* TODO add a reply button under this template for comments */}
     </div>
   );  
 };
@@ -488,10 +421,6 @@ export default BlogPostDetail;
 // TODO add a flag for deleting
 // TODO add a flag for editing
 // TODO add a flag for creating
-// TODO add a flag for upvoting
-// TODO add a flag for downvoting
-// TODO add a flag for hiding
-// TODO add a flag for showing
 // TODO add a flag for adding tags
 // TODO add a flag for adding templates
 // TODO if this post is hidden add a flag and disable the button for editing

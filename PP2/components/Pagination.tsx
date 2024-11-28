@@ -13,12 +13,12 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPage
   }
 
   return (
-    <div className="flex space-x-2 mt-4">
+    <div className="flex items-center space-x-4 mt-6">
       {/* Previous Button */}
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className={`px-4 py-2 border rounded ${currentPage === 1 ? "cursor-not-allowed text-gray-400" : "hover:bg-gray-100"}`}
+        className={`px-4 py-2 border rounded ${currentPage === 1 ? "cursor-not-allowed text-gray-500" : "hover:bg-gray-600"}`}
       >
         Previous
       </button>
@@ -29,7 +29,7 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPage
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className={`px-4 py-2 border rounded ${currentPage === totalPages ? "cursor-not-allowed text-gray-400" : "hover:bg-gray-100"}`}
+        className={`px-4 py-2 border rounded ${currentPage === totalPages ? "cursor-not-allowed text-gray-500" : "hover:bg-gray-600"}`}
       >
         Next
       </button>

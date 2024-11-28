@@ -1,7 +1,8 @@
 import React from "react";
 import Link from "next/link";
-import UserAvatar from "./UserAvatar";
+import UserAvatar from "./BlogAvatar";
 import RatingForm from "@/components/forms/RatingForm";
+import Hidden from "../errors/Hidden";
 
 interface BlogPostCardProps {
     id: number;
@@ -44,36 +45,49 @@ const BlogPostCard: React.FC<BlogPostCardProps> = ({
 
     return (
         <Link href={`/blog/${id}`} passHref>
-            <div className="blog-post-card cursor-pointer p-4 border rounded-lg hover:shadow-md transition-shadow duration-300">
-                <div className="flex items-center justify-between mb-4">
-                    {" "}
-                    {/* TODO maybe make this responsive by adding flex-wrap */}
-                    <h3 className="text-xl font-bold mb-2">{title}</h3>
-                    <UserAvatar
-                        userId={authorId}
-                        avatarUrl={authorAvatarUrl}
-                        username={authorUsername}
-                    />
-                </div>
-                {isHidden && (
-                    <div className="bg-red-100 text-red-700 p-2 rounded-md mb-4">
-                        This post is hidden: {hiddenReason}
-                    </div>
-                )}
-                <p className="text-gray-700 mb-4">{description}</p>{" "}
-                {/* TODO: truncate description*/}
-                <div className="text-sm text-gray-500 mb-2">
-                    {tags.slice(0, 3).map((tag) => (
-                        <span key={tag} className="tag border-white">
-                            {tag}
-                        </span>
-                    ))}
-                </div>
-                <RatingForm upvoteCount={upvoteCount} downvoteCount={downvoteCount} userVote={null} onVoteChange={() => {}} />
-                <div className="text-sm font-medium"> Created At: {formattedCreationDate}</div>
-                <span></span>
-            </div>
-        </Link>
+  <div className="blog-post-card cursor-pointer p-6 border border-gray-300 rounded-lg bg-gray-800 mb-6 mx-4 hover:bg-gray-700">
+    {isHidden && (
+      <Hidden type="post" hiddenReason={hiddenReason || "No reason provided"} />
+    )}
+    <div className="flex items-center justify-between mb-4">
+      <h3 className="text-2xl font-semibold mb-2 text-white">{title}</h3>
+      <div className="flex-shrink-0 ml-4">
+        <UserAvatar
+          userId={authorId}
+          avatarUrl={authorAvatarUrl}
+          username={authorUsername}
+        />
+      </div>
+    </div>
+    <p className="text-gray-300 mb-4">{description}</p> {/* TODO: truncate description */}
+    
+    <div className="flex items-center space-x-6 text-sm text-gray-400 mb-4">
+      <div className="flex items-center space-x-2">
+        <RatingForm
+          upvoteCount={upvoteCount}
+          downvoteCount={downvoteCount}
+          userVote={null}
+          onVoteChange={() => {}}
+        />
+      </div>
+      <div className="flex flex-wrap mt-2">
+        {tags.slice(0, 3).map((tag) => (
+          <span
+            key={tag}
+            className="tag inline-block px-3 py-1 mr-2 mb-2 text-xs font-medium bg-gray-700 text-gray-300 rounded-full"
+          >
+            {tag}
+          </span>
+        ))}
+      </div>
+    </div>
+    <div className="text-sm font-medium text-gray-300 mt-4">
+      Created At: {formattedCreationDate}
+    </div>
+  </div>
+</Link>
+
+      
     );
 };
 

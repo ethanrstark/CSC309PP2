@@ -19,6 +19,7 @@ export default async  function UserAuth(req:NextApiRequest,res:NextApiResponse){
                     id:user.id
                 },
                 select:{
+                id:true,
                 userName:true,
                 firstName:true,
                 lastName:true,
