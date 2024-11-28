@@ -168,6 +168,12 @@ console.log(res)
 const handleTagPageChange = (newPage:number)=>{
     setTagPage(newPage)
 }
+
+const redirectToEditor = (templateId:number) => {
+      
+  router.push(`/editor?forkedId=${templateId}`); // Use router.push to navigate to the editor page
+
+};
   return (
    
     <div className="min-h-screen bg-gray-900 text-white">
@@ -297,7 +303,7 @@ const handleTagPageChange = (newPage:number)=>{
                   </div>
                 </td>
                 <td className="px-4 py-2 text-center">
-                  <button className="text-green-500 hover:text-green-700">
+                  <button className="text-green-500 hover:text-green-700" onClick={()=>redirectToEditor(template.id)}>
                     <i className="fas fa-play-circle"></i> {/* Play icon */}
                   </button>
                 </td>

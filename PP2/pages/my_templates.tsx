@@ -446,6 +446,12 @@ export default function My_Templates(){
         }
 
     }
+
+    const redirectToEditor = (templateId:number) => {
+      
+          router.push(`/editor?templateId=${templateId}`); // Use router.push to navigate to the editor page
+      
+  };
       return (
        
         <div className="min-h-screen bg-gray-900 text-white">
@@ -584,9 +590,13 @@ export default function My_Templates(){
       
                       <td className="px-4 py-2 text-center">
                         <div className="flex space-x-4">
-                          <button className="text-green-500 hover:text-green-700 flex items-center space-x-2">
+                        
+                          <button className="text-green-500 hover:text-green-700 flex items-center space-x-2"
+                          onClick={()=>redirectToEditor(template.id)}>
                             <i className="fas fa-play-circle"></i>
+                            
                           </button>
+                          
                           <button
                             className="text-gray-500 hover:text-gray-700 flex items-center space-x-2"
                             onClick={() => {setTemplateDel(template.id); setPopUpOpen(true)}}

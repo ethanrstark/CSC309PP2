@@ -4,22 +4,123 @@ import axios from 'axios';
 import Editor from "@monaco-editor/react";
 import Sidebar from '@/components/sidebar/Sidebar';
 import SaveEditTemplate from "@/components/SaveTemplateButton";
-
-
-
+import { useRouter } from 'next/router';
+//add in a prop 
+interface CodeEditorProp {
+    existId?:string          //existing or forked template id
+}
 //code editor component to be returned
-const CodeEditor = () => {
-
+const CodeEditor: React.FC<CodeEditorProp> = ({existId}) => {
     const [code, setCode] = useState('');
     const [language, setLanguage] = useState('javascript');
     const [stdin, setStdin] = useState('');
     const [output, setOutput] = useState('');
     const [error, setError] = useState('');
-
-    //save button functionality
     const [templateId, setTemplateId] = useState<number | null>(null); // Template ID for editing
-    const [forkedId, setforkedId] = useState<number|null>(1)
+    const [forkedId, setforkedId] = useState<number|null>(null)
+    const router=useRouter()
+    //populate code state if existing code
+    const fetchTemplate = async () => {
+   if(router.query.templateId){
+    let url = `/api/CodeTemplate/${router.query.templateId}`;
+     
+         try{
+              const res = await fetch(url,
+         
+         {
+             method: 'GET',
+             cache: 'no-store', 
+           }
+      
+        
+     );
+     console.log(res)
+         
+     
+          const data = await res.json();
+          console.log(data)
+          //console.log(data.pagedTemplates.length)
+          if (res.ok){
+             //if(data.paged_templates && data.paged_templates.length>0){
+            
+             setCode(data.code)
+             console.log(data)
+             console.log(data.code)
+             const id = parseInt(typeof router.query.templateId === 'string' ? router.query.templateId : '')
+             setTemplateId(id)
+            
+        
+         }else{
+          
+             console.error(data.message)
+         }
+     
+          
+          
+            
+         //console.log(templates)
+         }catch(err:any){
+             console.error(err)
+         }
+   }else if (router.query.forkedId){
+    let url = `/api/CodeTemplate/${router.query.forkedId}`;
+     
+         try{
+              const res = await fetch(url,
+         
+         {
+             method: 'GET',
+             cache: 'no-store', 
+           }
+      
+        
+     );
+     console.log(res)
+         
+     
+          const data = await res.json();
+          console.log(data)
+          //console.log(data.pagedTemplates.length)
+          if (res.ok){
+             //if(data.paged_templates && data.paged_templates.length>0){
+            
+             setCode(data.code)
+             console.log(data)
+             console.log(data.code)
+             const id = parseInt(typeof router.query.forkedId === 'string' ? router.query.forkedId : '')
+             setforkedId(id)
+            
+        
+         }else{
+          
+             console.error(data.message)
+         }
+     
+          
+          
+            
+         //console.log(templates)
+         }catch(err:any){
+             console.error(err)
+         }
+   }
+        
+       
+         
+        
+       };
 
+       useEffect(()=>{
+        if(router.isReady){
+            fetchTemplate()
+        }
+       },[router.isReady,router.query.templateId,router.query, router.query.forkedId])
+
+       // Callback to update templateId when a new template is saved
+  const handleTemplateSaved = (newTemplateId: number) => {
+    setTemplateId(newTemplateId); // Update the templateId state
+    console.log(templateId)
+  };
     //when execute is called, send a post request to the server
     const handleExecute = async () => {
 
@@ -60,15 +161,14 @@ const CodeEditor = () => {
       setSidebarVisible(!sidebarVisible);
     };
 
-    // Callback to update templateId when a new template is saved
-    const handleTemplateSaved = (newTemplateId: number) => {
-        setTemplateId(newTemplateId); // Update the templateId state
-        console.log(templateId)
-    };
-
     return (
-        <div className="h-screen w-screen bg-gray-900">
-
+        <div className="h-full bg-gray-900">
+        <SaveEditTemplate
+        code={code}
+        forkedTemplateId={forkedId}             //don't need
+        editTemplateId={templateId}             //need to pass this
+        newlySavedTemplate={handleTemplateSaved} // Pass the callback here
+      />
             <div
             className={`bg-gray-800 text-white w-64 min-h-screen p-6 fixed top-0 left-0 transition-all duration-400 ${
                 sidebarVisible ? 'translate-x-0' : '-translate-x-full'
@@ -146,22 +246,13 @@ const CodeEditor = () => {
                     <div id="code-output" className="w-full p-4 bg-gray-800 border border-gray-600 rounded mt-4">
                         {error|| 'Errors will be shown here...'}
                     </div>
-                    <div className="py=6 pt-6">
-                        <SaveEditTemplate
-                            code={code}
-                            forkedTemplateId={forkedId}
-                            editTemplateId={templateId}
-                            newlySavedTemplate={handleTemplateSaved} // Pass the callback here
-                        />
-                    </div>
-
 
                 </section>
             
             </main>
   
   
-        </div>
+      </div>
 
        
     );
