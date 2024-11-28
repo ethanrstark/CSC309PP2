@@ -64,6 +64,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     //preapare for docker image and command
     let dockerImage = '';
     let dockerCommand = '';
+    const memoryLimit = '512m';
+    const timeLimit = '5s';
+
 
 
     //cases for different languages
@@ -73,9 +76,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             dockerImage = 'my-python-image';
             
             if(stdin){
-                dockerCommand = `docker run --rm -v ${tmpDir}:/app ${dockerImage} sh -c "python /app/${filename} < /app/input.txt "`;
+                dockerCommand = `docker run --rm -v ${tmpDir}:/app --memory=${memoryLimit} ${dockerImage} sh -c "timeout ${timeLimit} python /app/${filename} < /app/input.txt "`;
             }else{
-                dockerCommand = `docker run --rm -v ${tmpDir}:/app ${dockerImage} sh -c "python /app/${filename}"`;
+                dockerCommand = `docker run --rm -v ${tmpDir}:/app --memory=${memoryLimit} ${dockerImage} sh -c "timeout ${timeLimit} python /app/${filename}"`;
             }
             
             break;
@@ -84,18 +87,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             dockerImage = 'my-javascript-image';
             if(stdin){
              
-                dockerCommand = `docker run --rm -v ${tmpDir}:/app ${dockerImage} sh -c "node /app/${filename} < /app/input.txt"`;
+                dockerCommand = `docker run --rm -v ${tmpDir}:/app --memory=${memoryLimit} ${dockerImage} sh -c "timeout ${timeLimit} node /app/${filename} < /app/input.txt"`;
             }else{
-                dockerCommand = `docker run --rm -v ${tmpDir}:/app ${dockerImage} sh -c "node /app/${filename}"`;
+                dockerCommand = `docker run --rm -v ${tmpDir}:/app --memory=${memoryLimit} ${dockerImage} sh -c "timeout ${timeLimit} node /app/${filename}"`;
             }
             break;
 
         case 'typescript':
             dockerImage = 'my-typescript-image';
             if(stdin){
-                dockerCommand = `docker run --rm -v ${tmpDir}:/app ${dockerImage} sh -c "tsc /app/${filename} && node /app/script.js < /app/input.txt"`;
+                dockerCommand = `docker run --rm -v ${tmpDir}:/app --memory=${memoryLimit} ${dockerImage} sh -c "timeout ${timeLimit} tsc /app/${filename} && node /app/script.js < /app/input.txt"`;
             }else{
-                dockerCommand = `docker run --rm -v ${tmpDir}:/app ${dockerImage} sh -c "tsc /app/${filename} && node /app/script.js"`;
+                dockerCommand = `docker run --rm -v ${tmpDir}:/app --memory=${memoryLimit} ${dockerImage} sh -c "timeout ${timeLimit} tsc /app/${filename} && node /app/script.js"`;
             }
             
             break;
@@ -120,9 +123,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const nowhitespace = noclass.replace(/\s/g, '');
 
             if(stdin){
-                dockerCommand = `docker run --rm -v ${tmpDir}:/app ${dockerImage} sh -c "javac /app/${filename} && java -cp /app ${nowhitespace} < /app/input.txt"`;
+                dockerCommand = `docker run --rm -v ${tmpDir}:/app --memory=${memoryLimit} ${dockerImage} sh -c "timeout ${timeLimit} javac /app/${filename} && java -cp /app ${nowhitespace} < /app/input.txt"`;
             }else{
-                dockerCommand = `docker run --rm -v ${tmpDir}:/app ${dockerImage} sh -c "javac /app/${filename} && java -cp /app ${nowhitespace}"`;
+                dockerCommand = `docker run --rm -v ${tmpDir}:/app --memory=${memoryLimit} ${dockerImage} sh -c "timeout ${timeLimit} javac /app/${filename} && java -cp /app ${nowhitespace}"`;
             }
             
             break;
@@ -130,9 +133,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         case 'cpp':
             dockerImage = 'my-cpp-image';
             if(stdin){
-                dockerCommand = `docker run --rm -v ${tmpDir}:/app ${dockerImage} sh -c "g++ /app/${filename} -o /app/script && /app/script < /app/input.txt"`;
+                dockerCommand = `docker run --rm -v ${tmpDir}:/app --memory=${memoryLimit} ${dockerImage} sh -c "timeout ${timeLimit} g++ /app/${filename} -o /app/script && /app/script < /app/input.txt"`;
             }else{
-                dockerCommand = `docker run --rm -v ${tmpDir}:/app ${dockerImage} sh -c "g++ /app/${filename} -o /app/script && /app/script"`;
+                dockerCommand = `docker run --rm -v ${tmpDir}:/app --memory=${memoryLimit} ${dockerImage} sh -c "timeout ${timeLimit} g++ /app/${filename} -o /app/script && /app/script"`;
             }
             
             break;
@@ -140,9 +143,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         case 'c':
             dockerImage = 'my-c-image';
             if(stdin){
-                dockerCommand = `docker run --rm -v ${tmpDir}:/app ${dockerImage} sh -c "gcc /app/${filename} -o /app/script && /app/script < /app/input.txt"`;
+                dockerCommand = `docker run --rm -v ${tmpDir}:/app --memory=${memoryLimit} ${dockerImage} sh -c "timeout ${timeLimit} gcc /app/${filename} -o /app/script && /app/script < /app/input.txt"`;
             }else{
-                dockerCommand = `docker run --rm -v ${tmpDir}:/app ${dockerImage} sh -c "gcc /app/${filename} -o /app/script && /app/script"`;
+                dockerCommand = `docker run --rm -v ${tmpDir}:/app --memory=${memoryLimit} ${dockerImage} sh -c "timeout ${timeLimit} gcc /app/${filename} -o /app/script && /app/script"`;
             }
             
             break;
@@ -151,9 +154,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             dockerImage = 'my-ruby-image';
 
             if(stdin){
-                dockerCommand = `docker run --rm -v ${tmpDir}:/app ${dockerImage} sh -c "ruby /app/${filename} < /app/input.txt"`;
+                dockerCommand = `docker run --rm -v ${tmpDir}:/app --memory=${memoryLimit} ${dockerImage} sh -c "timeout ${timeLimit} ruby /app/${filename} < /app/input.txt"`;
             }else{
-                dockerCommand = `docker run --rm -v ${tmpDir}:/app ${dockerImage} sh -c "ruby /app/${filename}"`;
+                dockerCommand = `docker run --rm -v ${tmpDir}:/app --memory=${memoryLimit} ${dockerImage} sh -c "timeout ${timeLimit} ruby /app/${filename}"`;
             }
             
             break;
@@ -162,9 +165,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             dockerImage = 'my-go-image';
 
             if(stdin){
-                dockerCommand = `docker run --rm -v ${tmpDir}:/app ${dockerImage} sh -c "go run /app/${filename} < /app/input.txt"`;
+                dockerCommand = `docker run --rm -v ${tmpDir}:/app --memory=${memoryLimit} ${dockerImage} sh -c "timeout ${timeLimit} go run /app/${filename} < /app/input.txt"`;
             }else{
-                dockerCommand = `docker run --rm -v ${tmpDir}:/app ${dockerImage} sh -c "go run /app/${filename}"`;
+                dockerCommand = `docker run --rm -v ${tmpDir}:/app --memory=${memoryLimit} ${dockerImage} sh -c "timeout ${timeLimit} go run /app/${filename}"`;
             }
             
             break;
@@ -173,9 +176,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             dockerImage = 'my-swift-image';
 
             if(stdin){
-                dockerCommand = `docker run --rm -v ${tmpDir}:/app ${dockerImage} sh -c "swift /app/${filename} < /app/input.txt"`;
+                dockerCommand = `docker run --rm -v ${tmpDir}:/app --memory=${memoryLimit} ${dockerImage} sh -c "timeout ${timeLimit} swift /app/${filename} < /app/input.txt"`;
             }else{
-                dockerCommand = `docker run --rm -v ${tmpDir}:/app ${dockerImage} sh -c "swift /app/${filename}"`;
+                dockerCommand = `docker run --rm -v ${tmpDir}:/app --memory=${memoryLimit} ${dockerImage} sh -c "timeout ${timeLimit} swift /app/${filename}"`;
             }
             
             break;
@@ -184,9 +187,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             dockerImage = 'my-php-image';
 
             if(stdin){
-                dockerCommand = `docker run --rm -v ${tmpDir}:/app ${dockerImage} sh -c "php /app/${filename} < /app/input.txt"`;
+                dockerCommand = `docker run --rm -v ${tmpDir}:/app --memory=${memoryLimit} ${dockerImage} sh -c "timeout ${timeLimit} php /app/${filename} < /app/input.txt"`;
             }else{
-                dockerCommand = `docker run --rm -v ${tmpDir}:/app ${dockerImage} sh -c "php /app/${filename}"`;
+                dockerCommand = `docker run --rm -v ${tmpDir}:/app --memory=${memoryLimit} ${dockerImage} sh -c "timeout ${timeLimit} php /app/${filename}"`;
             }
             
             break;
@@ -196,9 +199,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
             if(stdin){
                 //rust needs to remove the rs to run the file
-                dockerCommand = `docker run --rm -v ${tmpDir}:/app ${dockerImage} sh -c "rustc /app/${filename} && /app/script < /app/input.txt"`;
+                dockerCommand = `docker run --rm -v ${tmpDir}:/app --memory=${memoryLimit} ${dockerImage} sh -c "timeout ${timeLimit} rustc /app/${filename} && /app/script < /app/input.txt"`;
             }else{
-                dockerCommand = `docker run --rm -v ${tmpDir}:/app ${dockerImage} sh -c "rustc /app/${filename} && /app/script"`;
+                dockerCommand = `docker run --rm -v ${tmpDir}:/app --memory=${memoryLimit} ${dockerImage} sh -c "timeout ${timeLimit} rustc /app/${filename} && /app/script"`;
             }
             
             break
@@ -232,8 +235,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } catch (error) {
 
         //if there is an error catch it
-        const stderr = (error as any).stderr || (error as any).message;
+        const stderr = (error as any).stderr;
         console.error('Error executing:', error);
-        return res.status(400).json({ stderr });
+
+        return res.status(400).json({ stderr: stderr || 'Memory/time limit exceeded' });
     }
 }

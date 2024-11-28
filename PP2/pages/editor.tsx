@@ -2,17 +2,23 @@ import React, { useEffect, useState } from 'react';
 import { GetStaticPaths, GetStaticProps } from 'next';
 import axios from 'axios';
 import Editor from "@monaco-editor/react";
-import Sidebar from '@/components/sidebar/SideBar';
+import Sidebar from '@/components/sidebar/Sidebar';
+import SaveEditTemplate from "@/components/SaveTemplateButton";
 
 
 
 //code editor component to be returned
 const CodeEditor = () => {
+
     const [code, setCode] = useState('');
     const [language, setLanguage] = useState('javascript');
     const [stdin, setStdin] = useState('');
     const [output, setOutput] = useState('');
     const [error, setError] = useState('');
+
+    //save button functionality
+    const [templateId, setTemplateId] = useState<number | null>(null); // Template ID for editing
+    const [forkedId, setforkedId] = useState<number|null>(1)
 
     //when execute is called, send a post request to the server
     const handleExecute = async () => {
@@ -52,6 +58,12 @@ const CodeEditor = () => {
 
     const toggleSidebar = () => {
       setSidebarVisible(!sidebarVisible);
+    };
+
+    // Callback to update templateId when a new template is saved
+    const handleTemplateSaved = (newTemplateId: number) => {
+        setTemplateId(newTemplateId); // Update the templateId state
+        console.log(templateId)
     };
 
     return (
@@ -134,13 +146,22 @@ const CodeEditor = () => {
                     <div id="code-output" className="w-full p-4 bg-gray-800 border border-gray-600 rounded mt-4">
                         {error|| 'Errors will be shown here...'}
                     </div>
+                    <div className="py=6 pt-6">
+                        <SaveEditTemplate
+                            code={code}
+                            forkedTemplateId={forkedId}
+                            editTemplateId={templateId}
+                            newlySavedTemplate={handleTemplateSaved} // Pass the callback here
+                        />
+                    </div>
+
 
                 </section>
             
             </main>
   
   
-      </div>
+        </div>
 
        
     );

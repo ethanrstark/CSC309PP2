@@ -206,7 +206,7 @@ const SaveEditTemplate: React.FC<Props>=({code,forkedTemplateId, editTemplateId,
      
     return (
         <> 
-        <button className="text-gray-300 hover:text-gray-400 flex items-center space-x-2 rounded-lg border-2 border-gray-600 px-4 py-2 bg-gray-800 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-600" onClick={(e)=>{
+        <button className="text-black hover:text-gray-400 flex items-center space-x-2 rounded-lg border-2 border-gray-600 px-4 py-2 bg-gray-800 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-600" onClick={(e)=>{
           handleAuthen()
           
             if (editTemplateId){
@@ -241,7 +241,7 @@ const SaveEditTemplate: React.FC<Props>=({code,forkedTemplateId, editTemplateId,
               name="title"
               value={formData.title}
               onChange={fieldChange}
-              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="mt-1 text-black block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               
             />
           </div>
@@ -257,7 +257,7 @@ const SaveEditTemplate: React.FC<Props>=({code,forkedTemplateId, editTemplateId,
               name="explanation"
               value={formData.explanation}
               onChange={fieldChange}
-              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="mt-1 text-black block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               
             />
           </div>
@@ -273,7 +273,7 @@ const SaveEditTemplate: React.FC<Props>=({code,forkedTemplateId, editTemplateId,
               name="file_name"
               value={formData.file_name}
               onChange={fieldChange}
-              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="mt-1 text-black block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
              
             />
           </div>
