@@ -141,7 +141,17 @@ console.log(res)
         </div>
       );
     }
-  
+    const redirectToEditor = (templateId:number) => {
+        if(router.query.userName){
+            router.push(`/editor?templateId=${templateId}`); // Use router.push to navigate to the editor page
+
+        }else{
+                    router.push(`/editor?forkedId=${templateId}`); // Use router.push to navigate to the editor page
+
+        }
+      
+      
+      };
     return (
       <div className="min-h-screen flex flex-col bg-gray-800 text-white">
         <link
@@ -181,7 +191,7 @@ console.log(res)
                     )}
                   </td>
                   <td className="px-4 py-2 text-center">
-                    <button className="text-green-500 hover:text-green-700">
+                    <button className="text-green-500 hover:text-green-700" onClick={()=>redirectToEditor(template.id)}>
                       <i className="fas fa-play-circle"></i> {/* Use the play icon */}
                     </button>
                   </td>
