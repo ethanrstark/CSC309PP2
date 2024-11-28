@@ -291,11 +291,16 @@ const SaveEditTemplate: React.FC<Props>=({code,forkedTemplateId, editTemplateId,
                     className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="">Select Language</option>
-                    <option value="JavaScript">JavaScript</option>
-                    <option value="PYTHON">PYTHON</option>
-                    <option value="JAVA">Java</option>
-                    <option value="CPP">C++</option>
-                    <option value="C">C</option>
+                    <option value="javascript">JavaScript</option>
+                    <option value="python">PYTHON</option>
+                    <option value="java">Java</option>
+                    <option value="cpp">C++</option>
+                    <option value="c">C</option>
+                    <option value="rust">Rust</option>
+                    <option value="ruby">Ruby</option>
+                    <option value="go">Go</option>
+                    <option value="swift">Swift</option>
+                    <option value="php">PHP</option>
                   </select>
                 </div>
           

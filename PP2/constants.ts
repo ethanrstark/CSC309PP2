@@ -20,7 +20,7 @@ export interface AuthenticatedRequest extends NextApiRequest {
 }
 
 // Array for valid languages
-export const VALID_LANGUAGES = ["C", "CPP", "JAVA", "PYTHON", "JavaScript"] as const;
+export const VALID_LANGUAGES = ["javascript", "python", "java", "cpp", "c","rust","ruby","go","swift","php"] as const;
 export type LanguageType = typeof VALID_LANGUAGES[number];
 
 // Custom types and constants for sorting and filtering blog posts:
