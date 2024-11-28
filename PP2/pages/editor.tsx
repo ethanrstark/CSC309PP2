@@ -67,7 +67,7 @@ const CodeEditor = () => {
     };
 
     return (
-        <div className="h-full bg-gray-900">
+        <div className="h-screen w-screen bg-gray-900">
 
             <div
             className={`bg-gray-800 text-white w-64 min-h-screen p-6 fixed top-0 left-0 transition-all duration-400 ${
