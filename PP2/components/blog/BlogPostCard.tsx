@@ -14,6 +14,8 @@ interface BlogPostCardProps {
     upvoteCount: number;
     downvoteCount: number;
     tags: string[];
+    isHidden: boolean;
+    hiddenReason?: string;
 }
 
 const BlogPostCard: React.FC<BlogPostCardProps> = ({
@@ -27,6 +29,8 @@ const BlogPostCard: React.FC<BlogPostCardProps> = ({
     upvoteCount,
     downvoteCount,
     tags,
+    isHidden,
+    hiddenReason,
 }) => {
     const date = new Date(createdAt);
     const formattedCreationDate = new Intl.DateTimeFormat("en-US", {
@@ -51,6 +55,11 @@ const BlogPostCard: React.FC<BlogPostCardProps> = ({
                         username={authorUsername}
                     />
                 </div>
+                {isHidden && (
+                    <div className="bg-red-100 text-red-700 p-2 rounded-md mb-4">
+                        This post is hidden: {hiddenReason}
+                    </div>
+                )}
                 <p className="text-gray-700 mb-4">{description}</p>{" "}
                 {/* TODO: truncate description*/}
                 <div className="text-sm text-gray-500 mb-2">
