@@ -1,6 +1,6 @@
 // pages/blog/index.tsx
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import BlogPostCard from "@/components/blog/BlogPostCard";
 import Pagination from "@/components/Pagination";
 import NoBlogPosts from "@/components/errors/NoBlogPosts";
@@ -57,6 +57,7 @@ const myPosts = () => {
   const [data, setData] = useState<BlogPostListResponse>({blogPosts: [], postCount: 0});
   const [error, setError] = useState<string>("");
   const [userId, setUserId]=useState<number>(0);
+  const [page, setPage] = useState<number>(1);
 
   const handleAuthen = async () => {
     try {
@@ -127,7 +128,10 @@ const myPosts = () => {
     fetchPosts();
   }, [userId, router.query]);
   
-
+  useEffect(() => {
+    if (!router.isReady || !router.query.page) return;
+    setPage(parseInt(router.query.page as string));
+  }, [router.query.page]);
 
   // If there was an error, show an error message
   if (error) {
@@ -172,12 +176,7 @@ const myPosts = () => {
       <Pagination
         currentPage={router.query.page ? parseInt(router.query.page as string) : 1}
         totalPages={Math.ceil(data.postCount / (router.query.limit ? parseInt(router.query.limit as string) : BLOG_POST_LIMIT))}
-        onPageChange={(page: number) =>
-          router.push({
-            pathname: `/blog/myPosts`,
-            query: { ...router.query , page },
-          })
-        }
+        onPageChange={(page: number) => {setPage(page)}}
       />
       </div>
     </div>

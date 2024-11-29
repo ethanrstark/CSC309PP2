@@ -104,17 +104,11 @@ const BlogPostList = () => {
     const { name, value } = e.target;
     if (name === "sortBy") {
       setSortBy(value);
-      router.push({
-        pathname: "/blog",
-        query: { ...router.query, sortBy: value },
-      });
+      router.push({ query: { ...router.query, sortBy: value } }, undefined, { shallow: false });
     }
     if (name === "sortOrder") {
       setSortOrder(value);
-      router.push({
-        pathname: "/blog",
-        query: { ...router.query, sortOrder: value },
-      });
+      router.push({ query: { ...router.query, sortOrder: value } }, undefined, { shallow: false });
     }
   };
 
@@ -123,8 +117,8 @@ const BlogPostList = () => {
       
     const queryParams = new URLSearchParams();
     queryParams.append('limit', router.query.limit as string || BLOG_POST_LIMIT.toString());
-    queryParams.append('sortBy', (router.query.sortBy as string) || "upvoteCount");
-    queryParams.append('sortOrder', (router.query.sortOrder as string) || "desc");
+    queryParams.append('sortBy', (router.query.sortBy as string) || sortBy);
+    queryParams.append('sortOrder', (router.query.sortOrder as string) || sortOrder);
     queryParams.append('countPosts', "true");
 
     if (titleFilter !== '') {
@@ -176,7 +170,7 @@ useEffect(() => {
     // Fetch posts only when necessary filters change
     fetchPosts();
   }
-}, [router.isReady, page, titleFilter, descriptionFilter, selectedTags, selectedTemplates]);
+}, [router.isReady, page, router.query, sortBy, sortOrder, titleFilter, descriptionFilter, selectedTags, selectedTemplates]);
 
 
 
@@ -465,12 +459,7 @@ useEffect(() => {
       <Pagination
               currentPage={router.query.page ? parseInt(router.query.page as string) : 1}
               totalPages={Math.ceil(data.postCount / BLOG_POST_LIMIT)}
-              onPageChange={(page: number) =>
-                router.push({
-                  pathname: "/blog",
-                  query: { ...router.query, page },
-                })
-              }
+              onPageChange={(page: number) => {setPage(page)}}
             />
       </div>
     </div>

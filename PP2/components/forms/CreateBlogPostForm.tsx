@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useRouter } from "next/router";
-import Pagination from "../Pagination";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 
 const TAG_LIMIT = 10;

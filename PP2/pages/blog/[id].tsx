@@ -76,6 +76,7 @@ const BlogPostDetail = () => {
   const [showReportForm, setShowReportForm] = useState(false);
   const [showCommentForm, setShowCommentForm] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
+  const [page, setPage] = useState<number>(1);
 
   const [deletedTemplate, setDeletedTemplate] = useState<number | null>(null);
   const [deletedTag, setDeletedTag] = useState<number | null>(null);
@@ -237,7 +238,7 @@ const BlogPostDetail = () => {
           } else if (retriedResponse.ok) {
             setUserVote(newVote);
             updateVoteCount(votedYet, newVote);
-            router.push({pathname: `/blog/${id}`, query: router.query});
+            router.reload();
             return;
           } else {
             throw new Error(`${retriedResponse.status}: ${retriedResponse.statusText}`);
@@ -249,7 +250,7 @@ const BlogPostDetail = () => {
       } else if (response.ok) {
         setUserVote(newVote);
         updateVoteCount(votedYet, newVote);
-        router.push({pathname: `/blog/${id}`, query: router.query});
+        router.reload();
         return;
       } else {
         throw new Error(`${response.status}: ${response.statusText}`);
@@ -372,6 +373,10 @@ const BlogPostDetail = () => {
     router.reload();
   }
 
+  useEffect(() => {
+    if (!router.isReady || !router.query.page) return;
+    setPage(parseInt(router.query.page as string));
+  }, [router.query.page]);
 
    // If there was an error, show an error message
    if (error) {
@@ -547,7 +552,7 @@ const BlogPostDetail = () => {
           <Pagination
           currentPage={router.query.page ? parseInt(router.query.page as string) : 1}
           totalPages={Math.ceil(commentData.commentCount / (router.query.limit ? parseInt(router.query.limit as string) : COMMENT_LIMIT))}
-          onPageChange={(page: number) => router.push({ pathname: `/blog/${id}`, query: { ...router.query, page } })}
+          onPageChange={(page: number) => {setPage(page)}}
         />
         </div>
         
