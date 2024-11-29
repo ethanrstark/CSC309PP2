@@ -161,12 +161,7 @@ const CodeEditor = () => {
 
     return (
         <div className="h-full bg-gray-900">
-        <SaveEditTemplate
-        code={code}
-        forkedTemplateId={forkedId}             //don't need
-        editTemplateId={templateId}             //need to pass this
-        newlySavedTemplate={handleTemplateSaved} // Pass the callback here
-      />
+  
 
   
   
@@ -175,9 +170,20 @@ const CodeEditor = () => {
                 sidebarVisible ? 'flex-1 ml-64' : 'flex-1 ml-0'
             }`}
             >
+
+
                 <section id="code-editor" className="p-4 bg-gray-900 text-white">
                     <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-xl">Code Editor</h2>
+                        
+                        
+                        <div className="items-center">
+           
+                            <h2 className="text-xl">Code Editor</h2>
+
+                        </div>
+
+
+
                         <select 
                             id="language-select" 
                             className="p-2 border border-gray-800 bg-gray-700 rounded-md"
@@ -224,6 +230,13 @@ const CodeEditor = () => {
                     >
                         Execute
                     </button>
+
+                    <SaveEditTemplate
+                                    code={code}
+                                    forkedTemplateId={forkedId}             //don't need
+                                    editTemplateId={templateId}             //need to pass this
+                                    newlySavedTemplate={handleTemplateSaved} // Pass the callback here
+                    />
 
                     <div id="code-output" className="w-full p-4 bg-gray-800 border border-gray-600 rounded mt-4">
                         {output || 'Output will be shown here...'}
