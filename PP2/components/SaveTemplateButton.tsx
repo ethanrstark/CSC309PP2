@@ -212,9 +212,9 @@ const SaveEditTemplate: React.FC<Props>=({code,forkedTemplateId, editTemplateId,
    
      
     return (
-<div className="relative">
+<div>
   <button
-    className="text-gray-300 hover:text-gray-400 flex items-center space-x-2 rounded-lg border-2 border-gray-600 px-4 py-2 bg-gray-800 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-600 fixed top-4 right-4 z-50"
+    className="text-gray-300 hover:text-gray-400 flex items-center space-x-2 rounded-lg border-2 border-gray-600 px-4 py-2 bg-gray-800 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-600 absolute top-4 right-4 z-50"
     onClick={(e) => {
       handleAuthen();
 
@@ -231,7 +231,7 @@ const SaveEditTemplate: React.FC<Props>=({code,forkedTemplateId, editTemplateId,
   {saveTemplatePopUp && (
     <>
       {/* Background Overlay with Fade */}
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+      <div className="absolute inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
         <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md relative z-10">
           <h2 className="text-2xl font-bold text-center mb-6">Save</h2>
           <form onSubmit={(e: React.FormEvent) => { saveTemplate(e) }}>
@@ -246,7 +246,7 @@ const SaveEditTemplate: React.FC<Props>=({code,forkedTemplateId, editTemplateId,
                 name="title"
                 value={formData.title}
                 onChange={fieldChange}
-                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="text-black mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
@@ -261,7 +261,7 @@ const SaveEditTemplate: React.FC<Props>=({code,forkedTemplateId, editTemplateId,
                 name="explanation"
                 value={formData.explanation}
                 onChange={fieldChange}
-                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="text-black mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
@@ -276,7 +276,7 @@ const SaveEditTemplate: React.FC<Props>=({code,forkedTemplateId, editTemplateId,
                 name="file_name"
                 value={formData.file_name}
                 onChange={fieldChange}
-                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="text-black mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
@@ -290,7 +290,7 @@ const SaveEditTemplate: React.FC<Props>=({code,forkedTemplateId, editTemplateId,
                 name="language"
                 value={formData.language}
                 onChange={fieldChange}
-                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="text-black mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Select Language</option>
                 <option value="javascript">JavaScript</option>
