@@ -117,6 +117,8 @@ const SaveEditTemplate: React.FC<Props>=({code,forkedTemplateId, editTemplateId,
         //return the template id of created code template
         newlySavedTemplate(parseInt(data.id,10))
         setSaveTemplatePopUp(false)
+        alert("Template saved!")
+        
         }else{
           setError(data.message)
           
@@ -150,6 +152,8 @@ const SaveEditTemplate: React.FC<Props>=({code,forkedTemplateId, editTemplateId,
         //return the template id of created code template
         newlySavedTemplate(parseInt(data.id,10))
         setSaveTemplatePopUp(false)
+
+        alert("Template saved!")
         }else{
           setError(data.message)
         }
@@ -183,6 +187,7 @@ const SaveEditTemplate: React.FC<Props>=({code,forkedTemplateId, editTemplateId,
                 console.log(res)
                 console.log(data)
                 if (res.ok){
+                alert("Template saved!")
                     
                    
                 }else{
