@@ -20,7 +20,38 @@ const CreateBlogPostForm: React.FC<CreateBlogPostFormProps> = ({ availableTags, 
   const [tagPage, setTagPage] = useState(1);
   const [templatePage, setTemplatePage] = useState(1);
   const [error, setError] = useState("");
+  const [newTagName, setNewTagName] = useState("");
   const router = useRouter();
+
+  const handleNewTagSave = async () => {
+    if (!newTagName.trim()) return;
+
+    try {
+      const response = await fetch("/api/tag/create", {
+        method: "POST",
+        headers: {
+          authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name: newTagName }),
+      });
+
+      if (response.ok) {
+        const newTag = await response.json();
+        if (!selectedTags) {
+          setSelectedTags([newTag.id]);
+        } else {
+          setSelectedTags([...selectedTags, newTag.id]);
+        }
+        availableTags.push(newTag);
+        setNewTagName("");
+      } else {
+        throw new Error(`${response.status}: ${response.statusText}`);
+      }
+    } catch (err: any) {
+      setError(err.message);
+    }
+  };
 
   const handleTagPageChange = (page: number) => {
     setTagPage(page);
@@ -156,9 +187,26 @@ const CreateBlogPostForm: React.FC<CreateBlogPostFormProps> = ({ availableTags, 
       />
     </div>
 
+    <div className="flex items-center space-x-2">
+          <input
+            type="text"
+            value={newTagName}
+            onChange={(e) => setNewTagName(e.target.value)}
+            placeholder="Add new tag"
+            className="flex-1 text-gray-700 border p-2 rounded"
+          />
+          <button
+            type="button"
+            onClick={handleNewTagSave}
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+            Add Tag
+          </button>
+        </div>
+
     {/* Tags Section */}
     <div className="mb-4">
-      <label className="block text-md font-medium text-gray-700 mb-2">Tags</label>
+      <label className="block text-md font-medium text-gray-700 mb-2">Existing Tags</label>
       <div className="flex flex-wrap gap-2">
         {availableTags.slice((tagPage - 1) * TAG_LIMIT, tagPage * TAG_LIMIT).map((tag) => (
           <button

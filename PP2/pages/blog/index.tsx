@@ -282,14 +282,14 @@ useEffect(() => {
               value={titleFilter}
               onChange={(e) => setTitleFilter(e.target.value)}
               placeholder="Title Filter..."
-              className="p-2 border rounded-md"
+              className="p-2 text-gray-900 border rounded-md"
             />
             <input
               type="text"
               value={descriptionFilter}
               onChange={(e) => setDescriptionFilter(e.target.value)}
               placeholder="Description Filter..."
-              className="p-2 border rounded-md"
+              className="p-2 text-gray-900 border rounded-md"
             />
             <button
               type="button"
