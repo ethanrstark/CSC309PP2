@@ -1,131 +1,298 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
+import { XMarkIcon } from "@heroicons/react/24/outline";
 
-const EditBlogPostForm = ({ initialPostData }) => {
-  const router = useRouter();
-  const { blogPostId } = router.query;
+const TAG_LIMIT = 10;
+const CODE_TEMPLATE_LIMIT = 5;
 
-  const [title, setTitle] = useState(initialPostData?.title || "");
-  const [description, setDescription] = useState(initialPostData?.description || "");
-  const [newTags, setNewTags] = useState<number[]>([]);
-  const [removedTags, setRemovedTags] = useState<number[]>([]);
-  const [newTemplates, setNewTemplates] = useState<number[]>([]);
-  const [removedTemplates, setRemovedTemplates] = useState<number[]>([]);
+interface EditBlogPostFormProps {
+  prevTitle: string;
+  prevDescription: string;
+  availableTags: { id: number; name: string }[];
+  availableTemplates: { id: number; title: string }[];
+  blogPostId: number;
+  closeForm: () => void;
+}
+
+const EditBlogPostForm: React.FC<EditBlogPostFormProps> = ({
+  prevTitle,
+  prevDescription,
+  availableTags,
+  availableTemplates,
+  blogPostId,
+  closeForm,
+}) => {
+  const [title, setTitle] = useState(prevTitle);
+  const [description, setDescription] = useState(prevDescription);
+  const [selectedTags, setSelectedTags] = useState<number[]>([]);
+  const [selectedTemplates, setSelectedTemplates] = useState<number[]>([]);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [tagPage, setTagPage] = useState(1);
+  const [templatePage, setTemplatePage] = useState(1);
+  const router = useRouter();
+
+  const handleTagChange = (tagId: number) => {
+    setSelectedTags((prevTags) =>
+      (prevTags || []).includes(tagId) ? (prevTags || []).filter((id) => id !== tagId) : [...(prevTags || []), tagId]
+    );
+  };
+
+const handleTemplateChange = (templateId: number) => {
+  setSelectedTemplates((prevTemplates) =>
+    (prevTemplates || []).includes(templateId)
+      ? (prevTemplates || []).filter((id) => id !== templateId)
+      : [...(prevTemplates || []), templateId]
+  );
+};
+
+  const handleTagPageChange = (page: number) => {
+    setTagPage(page);
+  };
+
+  const handleTemplatePageChange = (page: number) => {
+    setTemplatePage(page);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
-    setSuccess(false);
-    setIsSubmitting(true);
+
+    const updatedPost = {
+      title,
+      description,
+      newTags: selectedTags,
+      newTemplates: selectedTemplates,
+    };
 
     try {
+      if (!title || !description) {
+        throw new Error("400: Title and description are required");
+      }
       const response = await fetch(`/api/blog/${blogPostId}/edit`, {
         method: "PUT",
         headers: {
+          authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          title,
-          description,
-          newTags,
-          removedTags,
-          newTemplates,
-          removedTemplates,
-        }),
+        body: JSON.stringify(updatedPost),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "An error occurred");
-      }
+      if (response.status === 401 || response.status === 403) {
+        const refreshResp = await fetch('/api/User/Refresh', {
+          headers: { authorization: `Bearer ${localStorage.getItem('refreshToken')}` },
+        });
 
-      setSuccess(true);
-      setTimeout(() => {
-        router.push(`/blog/${blogPostId}`);
-      }, 1500);
+        if (refreshResp.ok) {
+          const data = await refreshResp.json();
+          localStorage.setItem('accessToken', data.accessToken);
+          const retriedResponse = await fetch(`/api/blog/${blogPostId}/edit`, {
+            method: "PUT",
+            headers: {
+              authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(updatedPost),
+          });
+
+          if (retriedResponse.status === 401 || retriedResponse.status === 403) {
+            router.push('/login');
+            return;
+          } else if (retriedResponse.ok) {
+            closeForm();
+            return;
+          } else {
+            throw new Error(`${retriedResponse.status}: ${retriedResponse.statusText}`);
+          }
+        } else {
+          router.push('/login');
+          return;
+        }
+      } else if (response.ok) {
+        closeForm();
+        return;
+      } else {
+        throw new Error(`${response.status}: ${response.statusText}`);
+      }
     } catch (err: any) {
       setError(err.message);
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
+
+  if (error) {
+    alert(`Error: ${error}`);
+    setError("");
+  }
+
   return (
-    <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-4">
-      <h1 className="text-2xl font-bold">Edit Blog Post</h1>
+    <form onSubmit={handleSubmit} className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50">
+      <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg space-y-6 overflow-y-auto max-h-[80vh]">
+        {/* Header */}
+        <div className="flex justify-between items-center">
+          <h2 className="text-2xl font-semibold text-gray-800">Edit Blog Post</h2>
+          <button
+            type="button"
+            onClick={closeForm}
+            className="text-gray-400 hover:text-red-500 transition"
+          >
+            <XMarkIcon className="h-8 w-8" />
+          </button>
+        </div>
 
-      {error && <div className="text-red-500">{error}</div>}
-      {success && <div className="text-green-500">Blog post updated successfully!</div>}
+        {/* Error message */}
+        {error && <p className="text-red-500 mb-4">{error}</p>}
 
-      <div>
-        <label className="block text-sm font-medium">Title</label>
-        <input
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className="w-full p-2 border rounded"
-        />
+        {/* Title Input */}
+        <div className="mb-4">
+          <label htmlFor="title" className="block text-md font-medium text-gray-700 mb-2">
+            Title
+          </label>
+          <input
+            type="text"
+            id="title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            required
+            className="w-full border border-gray-300 rounded-lg p-3 focus:ring-blue-500 focus:border-blue-500 text-md text-gray-700"
+          />
+        </div>
+
+        {/* Description Input */}
+        <div className="mb-4">
+          <label htmlFor="description" className="block text-md font-medium text-gray-700 mb-2">
+            Description
+          </label>
+          <textarea
+            id="description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            required
+            className="w-full h-28 border border-gray-300 rounded-lg p-3 focus:ring-blue-500 focus:border-blue-500 text-md text-gray-700"
+          />
+        </div>
+
+        {/* Tags Section */}
+              <div className="mb-4">
+                <label className="block text-md font-medium text-gray-700 mb-2">Tags</label>
+                <div className="flex flex-wrap gap-2">
+                  {availableTags.slice((tagPage - 1) * TAG_LIMIT, tagPage * TAG_LIMIT).map((tag) => (
+                    <button
+                      key={tag.id}
+                      type="button"
+                      onClick={() => handleTagChange(tag.id)}
+                      className={`px-3 py-1 text-center text-sm rounded-lg focus:outline-none ${
+                        selectedTags?.includes(tag.id) ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'
+                      } hover:bg-blue-300 transition`}
+                    >
+                      {tag.name}
+                    </button>
+                  ))}
+                </div>
+                <div className="flex items-center justify-center space-x-4 mt-6">
+            {/* Previous Button */}
+            <button
+              type="button"
+              onClick={() => handleTagPageChange(tagPage - 1)}
+              disabled={tagPage === 1}
+              className={`px-4 py-2 border rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                tagPage === 1
+                  ? "cursor-not-allowed text-gray-500 bg-gray-200"
+                  : "hover:bg-blue-500 text-gray-700 hover:text-white bg-gray-100"
+              }`}
+            >
+              Previous
+            </button>
+
+            <p className="text-sm text-gray-700">
+              Page {tagPage} of {Math.ceil(availableTags.length / TAG_LIMIT)}
+            </p>
+
+            {/* Next Button */}
+            <button
+              type="button"
+              onClick={() => handleTagPageChange(tagPage + 1)}
+              disabled={tagPage === Math.ceil(availableTags.length / TAG_LIMIT)}
+              className={`px-4 py-2 border rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                tagPage === Math.ceil(availableTags.length / TAG_LIMIT)
+                  ? "cursor-not-allowed text-gray-500 bg-gray-200"
+                  : "hover:bg-blue-500 text-gray-700 hover:text-white bg-gray-100"
+              }`}
+            >
+              Next
+            </button>
+            </div>
+
+              </div>
+
+        {/* Templates Section */}
+            <div className="mb-4">
+              <label className="block text-md font-medium text-gray-700 mb-2">Templates</label>
+              <div className="grid grid-cols-1 gap-2">
+                {availableTemplates.slice((templatePage - 1) * CODE_TEMPLATE_LIMIT, templatePage * CODE_TEMPLATE_LIMIT).map((template) => (
+                  <button
+                    key={template.id}
+                    type="button"
+                    onClick={() => handleTemplateChange(template.id)}
+                    className={`w-full py-2 px-4 text-center rounded-lg focus:outline-none ${
+                      selectedTemplates?.includes(template.id) ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'
+                    } hover:bg-blue-300 transition`}
+                  >
+                    {template.title}
+                  </button>
+                ))}
+              </div>
+              <div className="flex items-center justify-center space-x-4 mt-6">
+          {/* Previous Button */}
+          <button
+            type="button"
+            onClick={() => handleTemplatePageChange(templatePage - 1)}
+            disabled={templatePage === 1}
+            className={`px-4 py-2 border rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              templatePage === 1
+                ? "cursor-not-allowed text-gray-500 bg-gray-200"
+                : "hover:bg-blue-500 text-gray-700 hover:text-white bg-gray-100"
+            }`}
+          >
+            Previous
+          </button>
+
+          <p className="text-sm text-gray-700">
+            Page {templatePage} of {Math.ceil(availableTemplates.length / CODE_TEMPLATE_LIMIT)}
+          </p>
+
+          {/* Next Button */}
+          <button
+            type="button"
+            onClick={() => handleTemplatePageChange(templatePage + 1)}
+            disabled={templatePage === Math.ceil(availableTemplates.length / CODE_TEMPLATE_LIMIT)}
+            className={`px-4 py-2 border rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              templatePage === Math.ceil(availableTemplates.length / CODE_TEMPLATE_LIMIT)
+                ? "cursor-not-allowed text-gray-500 bg-gray-200"
+                : "hover:bg-blue-500 text-gray-700 hover:text-white bg-gray-100"
+            }`}
+          >
+            Next
+          </button>
+          </div>
+
+            </div>
+
+        {/* Action Buttons */}
+        <div className="flex justify-center items-center">
+          <button
+            type="button"
+            onClick={closeForm}
+            className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 focus:outline-none"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 focus:outline-none"
+          >
+            Save Changes
+          </button>
+        </div>
       </div>
-
-      <div>
-        <label className="block text-sm font-medium">Description</label>
-        <textarea
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          className="w-full p-2 border rounded"
-        ></textarea>
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium">New Tags</label>
-        <input
-          type="text"
-          placeholder="Enter tag IDs separated by commas"
-          onChange={(e) => setNewTags(e.target.value.split(",").map(Number))}
-          className="w-full p-2 border rounded"
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium">Remove Tags</label>
-        <input
-          type="text"
-          placeholder="Enter tag IDs separated by commas"
-          onChange={(e) => setRemovedTags(e.target.value.split(",").map(Number))}
-          className="w-full p-2 border rounded"
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium">New Templates</label>
-        <input
-          type="text"
-          placeholder="Enter template IDs separated by commas"
-          onChange={(e) => setNewTemplates(e.target.value.split(",").map(Number))}
-          className="w-full p-2 border rounded"
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium">Remove Templates</label>
-        <input
-          type="text"
-          placeholder="Enter template IDs separated by commas"
-          onChange={(e) => setRemovedTemplates(e.target.value.split(",").map(Number))}
-          className="w-full p-2 border rounded"
-        />
-      </div>
-
-      <button
-        type="submit"
-        disabled={isSubmitting}
-        className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 disabled:opacity-50"
-      >
-        {isSubmitting ? "Updating..." : "Update Blog Post"}
-      </button>
     </form>
   );
 };
