@@ -9,13 +9,13 @@ interface CommentAvatarProps {
 
 const CommentAvatar: React.FC<CommentAvatarProps> = ({ userId, avatarUrl, username }) => {
   return (
-    <div className="flex items-center space-x-4 p-2 bg-gray-800 rounded-lg shadow-lg">
-      <span className="text-white font-semibold">{username}</span>
+    <div className="flex items-center space-x-2 p-1 bg-gray-700 rounded-lg shadow-lg">
       <img
       src={avatarUrl}
       alt={`${username}'s avatar`}
-      className="w-12 h-12 rounded-full object-cover border-2 border-gray-600"
+      className="w-8 h-8 rounded-full object-cover border-2 border-gray-600"
       />
+      <span className="text-white font-semibold text-sm">{username}</span>
     </div>
   );
 };

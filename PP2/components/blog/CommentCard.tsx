@@ -1,7 +1,7 @@
 // components/blog/CommentCard.tsx
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import UserAvatar from "@/components/blog/BlogAvatar";
+import UserAvatar from "@/components/blog/CommentAvatar";
 import ReportForm from '@/components/forms/ReportForm';
 import RatingForm from '@/components/forms/RatingForm';
 import CommentForm from '@/components/forms/CommentForm';
@@ -261,56 +261,45 @@ const CommentCard: React.FC<CommentCardProps> = ({
     }
 
 
-    {/** TODO should I indluce hidden and hidden reason for admins to see? */}
-  {/** TODO Add a button for creating comments? */}
-  // {/* Hidden comment details, visible only for admins */}
-  // {isHidden && (
-  //   <div className="text-sm text-red-500 mt-2">
-  //     <strong>Hidden</strong> - {hiddenReason}
-  //   </div>
-  // )}
   return (
-    <div className="comment" style={{ marginLeft: `${indentLevel * 20}px` }}>
+    
+    <div className="comment p-6 border border-gray-700 rounded-lg bg-gray-800 mb-6 mx-1 mt-6" style={{ marginLeft: `${indentLevel * 2}rem` }}>
+      {showReportForm && (
+        <ReportForm targetId={commentId} targetType="comment" onClose={handleCloseReportForm} />
+      )}
+      {showCommentForm && (
+           <CommentForm postId={blogPostId} parentId={commentId} onClose={handleCloseCommentForm} onSubmit={handleCommentSubmit} />
+      )}
       {isHidden && (<Hidden type="comment" hiddenReason={hiddenReason || "No reason provided"} />)}
-      <div className="flex items-start mb-4">
+      <div className='w-fit'>
         <UserAvatar
-          userId={authorId}
-          avatarUrl={authorAvatarUrl}
-          username={authorUsername}
-        />
-        <div className="ml-3 flex-1">
-          <span className="text-xs text-gray-500">{formattedCreationDate}</span>
-          <p className="text-gray-800">{content}</p>
-          <div className="flex items-center space-x-4 mt-2">
-          <RatingForm upvoteCount={upvoteTotal} downvoteCount={downvoteTotal} userVote={userVote} onVoteChange={handleVote} />
-          </div>
-
-          {/* Reply button (could be implemented later with state management) */}
-          <button
-            className="mt-3 text-sm text-blue-500"
+            userId={authorId}
+            avatarUrl={authorAvatarUrl}
+            username={authorUsername}
+          />
+      </div>
+        <p className="flex flex-wrap mt-4 mb-3 text-md text-gray-300">{content}</p>
+        <div className='flex space-x-4'>
+        <RatingForm upvoteCount={upvoteTotal} downvoteCount={downvoteTotal} userVote={userVote} onVoteChange={handleVote} />
+        <span className="text-sm text-gray-300">{formattedCreationDate}</span>
+        </div>
+        <div className="flex items-center space-x-6">
+        <button
+          onClick={handleOpenReportForm}
+          className="flex items-center text-gray-500 hover:text-gray-200"
+        >
+          <FlagIcon className="h-6 w-6" />
+        </button>
+        <button
+            className="mt-3 text-md text-blue-500 hover:underline"
             onClick={handleOpenCommentForm}
           >
             Reply
-          </button>
-
-          <button
-          onClick={handleOpenReportForm}
-          className="flex items-center text-sm font-medium text-gray-700 hover:text-gray-900"
-        >
-          <FlagIcon className="h-5 w-5 mr-2" />
         </button>
-        </div>
-        {showReportForm && (
-        <ReportForm targetId={commentId} targetType="comment" onClose={handleCloseReportForm} />
-      )}
-      <button onClick={fetchReplies} className="mt-3 text-sm text-blue-500">
+        <button onClick={fetchReplies} className="mt-3 text-md text-blue-500 hover:underline">
         {showReplies ? "Hide Replies" : "Show Replies"}
       </button>
-      
       </div>
-      {showCommentForm && (
-           <CommentForm postId={blogPostId} parentId={commentId} onClose={handleCloseCommentForm} onSubmit={handleCommentSubmit} />
-         )}
       {showReplies && replies.map((reply) => <CommentCard key={reply.commentId} {...reply} />)}
     </div>
   );

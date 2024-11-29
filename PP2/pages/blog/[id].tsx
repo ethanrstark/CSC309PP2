@@ -4,7 +4,7 @@ import React, { cache, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { jwtDecode } from 'jwt-decode';
-import { ChatBubbleLeftEllipsisIcon, FlagIcon } from '@heroicons/react/24/outline';
+import { ChatBubbleLeftEllipsisIcon, FlagIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
 import Pagination from '@/components/Pagination';
 import UserAvatar from '@/components/blog/BlogAvatar';
@@ -14,7 +14,7 @@ import NoComments from '@/components/errors/NoComments';
 import NoBlogPosts from '@/components/errors/NoBlogPosts';
 import RatingForm from '@/components/forms/RatingForm';
 import CommentForm from '@/components/forms/CommentForm';
-import EllipsisDropdownButton from '@/components/buttons/EllipsisDropdownButton';
+import Hidden from '@/components/errors/Hidden';
 
 import { COMMENT_LIMIT } from '@/constants';
 
@@ -314,27 +314,35 @@ const BlogPostDetail = () => {
 
     return (
       <div className="blog-post-detail p-6 border border-gray-300 rounded-lg bg-gray-800 mb-6 mx-4">
+        {post.isHidden && userId === post.author.id && (
+          <Hidden type="post" hiddenReason={post.hiddenReason || "No reason provided"} />
+        )}
       <div className="flex items-center justify-between mb-4">
-        <h1 className="text-3xl font-semibold text-white">{post.title}</h1>
-      
-      </div>
-    
-      <div className="flex items-center mb-4">
+        <h1 className="text-4xl font-semibold text-white">{post.title}</h1>
         <UserAvatar
           userId={post.author.id}
           avatarUrl={post.author.avatar}
           username={post.author.userName}
         />
-        <div className="ml-4 text-sm text-gray-400">
-          <p className="font-medium text-gray-300">Author: {post.author.userName}</p>
-          <p className="text-gray-500">Created At: {formattedDate(post.createdAt)}</p>
-          <p className="text-gray-500">Updated At: {formattedDate(post.updatedAt)}</p>
-        </div>
       </div>
-    
       <p className="text-gray-300 mb-4">{post.description}</p>
+      <div className="mt-6">
+  <h2 className="text-2xl font-semibold text-white mb-2">Templates</h2>
+  <ul>
+    {post.templates.map((template) => (
+      <li key={template.id} className="mb-2">
+        <Link href={`/ViewTemplate/${template.id}`}>
+          <div className="p-3 border border-gray-500 rounded-lg bg-gray-900 text-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-all duration-300">
+            {template.title}
+          </div>
+        </Link>
+      </li>
+    ))}
+  </ul>
+</div>
+
     
-      <div className="flex items-center space-x-6 text-sm text-gray-400 mb-4">
+    <div className="flex items-center space-x-6 text-sm text-gray-400 mb-4">
         <RatingForm
           upvoteCount={upvoteTotal}
           downvoteCount={downvoteTotal}
@@ -345,40 +353,38 @@ const BlogPostDetail = () => {
           {post.tags.map((tag) => (
             <span
               key={tag.id}
-              className="tag inline-block px-3 py-1 mr-2 mb-2 text-xs font-medium bg-gray-700 text-gray-300 rounded-full"
+              className="tag flex items-center inline-block px-4 py-2 mr-1 mb-1 text-sm font-medium bg-gray-700 text-gray-300 rounded-full"
             >
               {tag.name}
+              <button
+                type="button"
+                onClick={() => router.push({ pathname: '/blog', query: { tag: tag.name } })}
+                >
+                <XMarkIcon className="h-4 w-4 ml-1 text-gray-500 hover:text-red-500 transition" />
+              </button>
             </span>
           ))}
         </div>
       </div>
-    
-      <div className="mt-4">
-        <h2 className="text-lg font-semibold text-white">Templates:</h2>
-        <ul>
-          {post.templates.map((template) => (
-            <li key={template.id} className="text-sm text-gray-300 hover:text-gray-200">
-              <Link href={`/ViewTemplate/${template.id}`}>
-                  {template.title}
-              </Link>
-            </li>
-          ))}
-        </ul>
+      <div className='flex space-x-4 mt-4'>
+        <p className="text-md text-gray-300">Created At: {formattedDate(post.createdAt)}</p>
+        <p className="text-md text-gray-300">Updated At: {formattedDate(post.updatedAt)}</p>
       </div>
+      
     
-      <div className="mt-4">
+      <div className="flex space-x-6 mt-4">
         <button
           onClick={handleOpenReportForm}
-          className="flex items-center text-sm font-medium text-gray-700 hover:text-gray-900"
+          className="flex items-center text-md font-medium text-gray-500 hover:text-gray-200"
         >
-          <FlagIcon className="h-5 w-5 mr-2" />
+          <FlagIcon className="h-7 w-7 mr-2" />
           Report Post
         </button>
         <button
           onClick={handleOpenCommentForm}
-          className="flex items-center text-sm font-medium text-gray-700 hover:text-gray-900 ml-4"
+          className="flex items-center text-md font-medium text-gray-500 hover:text-gray-200"
         >
-          <ChatBubbleLeftEllipsisIcon className="h-5 w-5 mr-2" />
+          <ChatBubbleLeftEllipsisIcon className="h-7 w-7 mr-2" />
           Comment
         </button>
       </div>
@@ -415,11 +421,14 @@ const BlogPostDetail = () => {
       )}
     
       {commentData.comments.length > 0 && (
-        <Pagination
+        <div className='flex justify-center'>
+          <Pagination
           currentPage={router.query.page ? parseInt(router.query.page as string) : 1}
           totalPages={Math.ceil(commentData.commentCount / (router.query.limit ? parseInt(router.query.limit as string) : COMMENT_LIMIT))}
           onPageChange={(page: number) => router.push({ pathname: `/blog/${id}`, query: { ...router.query, page } })}
         />
+        </div>
+        
       )}
     </div>
     
@@ -431,16 +440,12 @@ const BlogPostDetail = () => {
 export default BlogPostDetail;
 
 {/* TODO
-change to trash can and edit pencil if is hidden then disable the edit button
+change to trash can and edit pencil if is hidden then disable edit
 {userId === post.author.id && (
   <EllipsisDropdownButton onUpdate={handleUpdate} onDelete={handleDelete} />
 )}
 */}
 
-// TODO add a flag for creating
-
- 
-   
     
    
    
