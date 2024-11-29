@@ -167,13 +167,7 @@ const CodeEditor = () => {
         editTemplateId={templateId}             //need to pass this
         newlySavedTemplate={handleTemplateSaved} // Pass the callback here
       />
-            <div
-            className={`bg-gray-800 text-white w-64 min-h-screen p-6 fixed top-0 left-0 transition-all duration-400 ${
-                sidebarVisible ? 'translate-x-0' : '-translate-x-full'
-            }`}
-            >
-            <Sidebar />
-            </div>
+
   
   
             <main
@@ -181,12 +175,6 @@ const CodeEditor = () => {
                 sidebarVisible ? 'flex-1 ml-64' : 'flex-1 ml-0'
             }`}
             >
-            <button
-                onClick={toggleSidebar}
-                className="bg-gray-800 text-white p-2 mb-4"
-            >
-                {sidebarVisible ? '☰' : '☰'}
-            </button>
                 <section id="code-editor" className="p-4 bg-gray-900 text-white">
                     <div className="flex justify-between items-center mb-4">
                         <h2 className="text-xl">Code Editor</h2>
