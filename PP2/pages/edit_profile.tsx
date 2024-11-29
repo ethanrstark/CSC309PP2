@@ -220,7 +220,7 @@ const EditProfilePage: React.FC<FormProps>=()=>{
                 setError("Update successful!")
                 
                 console.log(data)
-                router.push('/')
+                //router.push('/')
             }
             else if(resp.status===403){
                 //authen unsucessful, redirect to refresh, if doesn't work go to login page
@@ -274,7 +274,7 @@ const EditProfilePage: React.FC<FormProps>=()=>{
                       avatarinputRef.current.value=""
     
                     }
-                    setError(null)
+                    setError("Updated successfully")
               }else{
                     setError(data.error)
                   } 
