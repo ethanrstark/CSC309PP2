@@ -4,7 +4,7 @@ import React, { cache, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { jwtDecode } from 'jwt-decode';
-import { ChatBubbleLeftEllipsisIcon, FlagIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { ChatBubbleLeftEllipsisIcon, FlagIcon, XMarkIcon, TrashIcon, PencilSquareIcon } from '@heroicons/react/24/outline';
 
 import Pagination from '@/components/Pagination';
 import UserAvatar from '@/components/blog/BlogAvatar';
@@ -15,6 +15,7 @@ import NoBlogPosts from '@/components/errors/NoBlogPosts';
 import RatingForm from '@/components/forms/RatingForm';
 import CommentForm from '@/components/forms/CommentForm';
 import Hidden from '@/components/errors/Hidden';
+import EditForm from '@/components/forms/EditBlogPostForm';
 
 import { COMMENT_LIMIT } from '@/constants';
 
@@ -74,6 +75,39 @@ const BlogPostDetail = () => {
   const [error, setError] = useState<string>("");
   const [showReportForm, setShowReportForm] = useState(false);
   const [showCommentForm, setShowCommentForm] = useState(false);
+  const [showEditForm, setShowEditForm] = useState(false);
+
+  const [deletedTemplate, setDeletedTemplate] = useState<number | null>(null);
+  const [deletedTag, setDeletedTag] = useState<number | null>(null);
+  const [tags, setTags] = useState<any[]>([]);
+  const [templates, setTemplates] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchTags = async () => {
+      try {
+        const response = await fetch(`/api/tag/getAll`, {cache: "no-store"});
+        if (!response.ok) throw new Error("Failed to fetch tags");
+        const res = await response.json();
+        setTags(res);
+      } catch (error: any) {
+        setError(error.message);
+      } 
+    };
+
+    const fetchTemplates = async () => {
+      try {
+        const response = await fetch(`/api/CodeTemplate/getAll`, {cache: "no-store"});
+        if (!response.ok) throw new Error("Failed to fetch templates");
+        const res = await response.json();
+        setTemplates(res);
+      } catch (error: any) {
+        setError(error.message);
+      } 
+    };
+
+    fetchTags();
+    fetchTemplates();
+  }, []);
 
   // Handlers
   const handleOpenReportForm = () => setShowReportForm(true);
@@ -81,7 +115,43 @@ const BlogPostDetail = () => {
   const handleOpenCommentForm = () => setShowCommentForm(true);
   const handleCloseCommentForm = () => setShowCommentForm(false);
 
-  const handleUpdate = () => router.push(`/blog/${id}/edit`); // TODO
+  useEffect(() => {
+    const updateTemplatesAndTags = async () => {
+      if (deletedTemplate) {
+        const res = await fetch(`/api/blog/${id}/edit`, {
+          method: 'PUT',
+          headers: {
+            authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ removedTemplates: [deletedTemplate] }),
+        });
+        if (!res.ok) {
+          router.push('/login');
+        } else {
+          router.reload();
+      }
+    }
+    if (deletedTag) {
+      const res = await fetch(`/api/blog/${id}/edit`, {
+        method: 'PUT',
+        headers: {
+          authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ removedTags: [deletedTag] }),
+      });
+      if (!res.ok) {
+        router.push('/login');
+      } else {
+        router.reload();
+    }
+  }
+    };
+
+    updateTemplatesAndTags();
+  }, [deletedTemplate, deletedTag]);
+
   const handleDelete = async () => {
     if (confirm("Are you sure you want to delete this blog post?")) {
       try {
@@ -263,7 +333,7 @@ const BlogPostDetail = () => {
           setUserId(decodedToken.id);
         }
         const [postResponse, voteResponse, commentsResponse] = await Promise.all([
-          fetch(`/api/blog/${id}`,{ cache: "no-store"}),
+          fetch(`/api/blog/${id}`, { cache: "no-store"}),
           fetch(`/api/blog/${id}/userRated`, { headers: { authorization: `Bearer ${token}` } }),
           fetch(`/api/blog/${id}/comments?page=${router.query.page || 1}&limit=${COMMENT_LIMIT}&countComments=true`, { headers: { authorization: `Bearer ${token}` }, cache: "no-store" }),
         ]);
@@ -297,6 +367,11 @@ const BlogPostDetail = () => {
     fetchData();
   }, [id, router.isReady]);
 
+  const handleCloseEditForm = () => {
+    setShowEditForm(false);
+    router.reload();
+  }
+
 
    // If there was an error, show an error message
    if (error) {
@@ -327,18 +402,36 @@ const BlogPostDetail = () => {
       </div>
       <p className="text-gray-300 mb-4">{post.description}</p>
       <div className="mt-6">
-  <h2 className="text-2xl font-semibold text-white mb-2">Templates</h2>
+      {post.templates.length > 0 && 
+      (<div>
+        <h2 className="text-2xl font-semibold text-white mb-2">Templates</h2>
   <ul>
     {post.templates.map((template) => (
-      <li key={template.id} className="mb-2">
-        <Link href={`/ViewTemplate/${template.id}`}>
-          <div className="p-3 border border-gray-500 rounded-lg bg-gray-900 text-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-all duration-300">
-            {template.title}
+      <li key={template.id} className="mb-2 relative">
+      <Link href={`/ViewTemplate/${template.id}`}>
+        <div className="flex items-center space-x-2 w-full">
+          <div className="p-3 border border-gray-500 rounded-lg bg-gray-900 text-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-all duration-300 w-full">
+            <p>{template.title}</p>
           </div>
-        </Link>
-      </li>
+        </div>
+      </Link>
+    
+      <button
+        key={template.id}
+        type="button"
+        disabled={post.isHidden || userId !== post.author.id}
+        className={`absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-500 ${post.isHidden || userId !== post.author.id ? 'text-gray-300 cursor-not-allowed' : 'hover:text-red-500 transition'}`}
+        onClick={() => setDeletedTemplate(template.id)}
+      >
+        <XMarkIcon className="h-8 w-8" />
+      </button>
+    </li>
+    
     ))}
   </ul>
+
+      </div>)}
+
 </div>
 
     
@@ -358,9 +451,11 @@ const BlogPostDetail = () => {
               {tag.name}
               <button
                 type="button"
-                onClick={() => router.push({ pathname: '/blog', query: { tag: tag.name } })}
+                disabled={post.isHidden || userId !== post.author.id}
+                className={`text-gray-500 ${post.isHidden || userId !== post.author.id ? 'text-gray-300 cursor-not-allowed' : 'hover:text-red-500 transition'}`}
+                onClick={() => setDeletedTag(tag.id)}
                 >
-                <XMarkIcon className="h-4 w-4 ml-1 text-gray-500 hover:text-red-500 transition" />
+                <XMarkIcon className="h-4 w-4 ml-1" />
               </button>
             </span>
           ))}
@@ -387,6 +482,29 @@ const BlogPostDetail = () => {
           <ChatBubbleLeftEllipsisIcon className="h-7 w-7 mr-2" />
           Comment
         </button>
+        {userId === post.author.id && (
+          <div className='flex space-x-6'>
+            <button
+          onClick={() => handleDelete()}
+          disabled={userId !== post.author.id}
+        className={`flex items-center text-md font-medium text-gray-500 ${userId !== post.author.id ? 'text-gray-400 cursor-not-allowed' : 'hover:text-gray-200'}`}
+        >
+          <TrashIcon className="h-7 w-7 mr-2" />
+          Delete Post
+        </button>
+            {!post.isHidden && (
+          <button
+          onClick={() => setShowEditForm(true)}
+          disabled={userId !== post.author.id || post.isHidden}
+        className={`flex items-center text-md font-medium text-gray-500 ${userId !== post.author.id || post.isHidden ? 'text-gray-400 cursor-not-allowed' : 'hover:text-gray-200'}`}
+        >
+          <PencilSquareIcon className="h-7 w-7 mr-2" />
+          Edit Post
+        </button>
+        )}
+          </div>
+        
+      )}
       </div>
     
       {showReportForm && (
@@ -395,6 +513,10 @@ const BlogPostDetail = () => {
     
       {showCommentForm && (
         <CommentForm postId={post.id} onClose={handleCloseCommentForm} onSubmit={handleCommentSubmit} />
+      )}
+
+    {showEditForm && (
+        <EditForm prevTitle={post.title} prevDescription={post.description} availableTags={tags.filter(tag => !post.tags.some(postTag => postTag.id === tag.id))} availableTemplates={templates.filter(template => !post.templates.some(postTemplate => postTemplate.id === template.id))} blogPostId={post.id} closeForm={() => handleCloseEditForm()} />
       )}
     
       {commentData.comments.length === 0 ? (

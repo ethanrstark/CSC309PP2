@@ -334,7 +334,36 @@ useEffect(() => {
                 ))}
               </div>
               <div className="flex items-center justify-center space-x-4 mt-6">
-                <Pagination currentPage={tagPage} totalPages={Math.ceil(tags.length / TAG_LIMIT)} onPageChange={handleTagPageChange} />
+              <button
+    type="button"
+    onClick={() => handleTagPageChange(tagPage - 1)}
+    disabled={tagPage === 1}
+    className={`px-4 py-2 border rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+      tagPage === 1
+        ? "cursor-not-allowed text-gray-500 bg-gray-200"
+        : "hover:bg-blue-500 text-gray-700 hover:text-white bg-gray-100"
+    }`}
+  >
+    Previous
+  </button>
+
+  <p className="text-sm text-gray-700">
+    Page {tagPage} of {Math.ceil(tags.length / TAG_LIMIT)}
+  </p>
+
+  {/* Next Button */}
+  <button
+    type="button"
+    onClick={() => handleTagPageChange(tagPage + 1)}
+    disabled={tagPage === Math.ceil(tags.length / TAG_LIMIT)}
+    className={`px-4 py-2 border rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+      tagPage === Math.ceil(tags.length / TAG_LIMIT)
+        ? "cursor-not-allowed text-gray-500 bg-gray-200"
+        : "hover:bg-blue-500 text-gray-700 hover:text-white bg-gray-100"
+    }`}
+  >
+    Next
+  </button>
               </div>
             </div>
 
@@ -356,7 +385,36 @@ useEffect(() => {
                 ))}
               </div>
               <div className="flex items-center justify-center space-x-4 mt-6">
-                <Pagination currentPage={templatePage} totalPages={Math.ceil(templates.length / CODE_TEMPLATE_LIMIT)} onPageChange={handleTemplatePageChange} />
+              <button
+    type="button"
+    onClick={() => handleTemplatePageChange(templatePage - 1)}
+    disabled={templatePage === 1}
+    className={`px-4 py-2 border rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+      templatePage === 1
+        ? "cursor-not-allowed text-gray-500 bg-gray-200"
+        : "hover:bg-blue-500 text-gray-700 hover:text-white bg-gray-100"
+    }`}
+  >
+    Previous
+  </button>
+
+  <p className="text-sm text-gray-700">
+    Page {templatePage} of {Math.ceil(templates.length / CODE_TEMPLATE_LIMIT)}
+  </p>
+
+  {/* Next Button */}
+  <button
+    type="button"
+    onClick={() => handleTemplatePageChange(templatePage + 1)}
+    disabled={templatePage === Math.ceil(templates.length / CODE_TEMPLATE_LIMIT)}
+    className={`px-4 py-2 border rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+      templatePage === Math.ceil(templates.length / CODE_TEMPLATE_LIMIT)
+        ? "cursor-not-allowed text-gray-500 bg-gray-200"
+        : "hover:bg-blue-500 text-gray-700 hover:text-white bg-gray-100"
+    }`}
+  >
+    Next
+  </button>
               </div>
             </div>
 
