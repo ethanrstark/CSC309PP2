@@ -29,7 +29,39 @@ const EditBlogPostForm: React.FC<EditBlogPostFormProps> = ({
   const [error, setError] = useState("");
   const [tagPage, setTagPage] = useState(1);
   const [templatePage, setTemplatePage] = useState(1);
+  const [newTagName, setNewTagName] = useState("");
   const router = useRouter();
+
+
+  const handleNewTagSave = async () => {
+    if (!newTagName.trim()) return;
+
+    try {
+      const response = await fetch("/api/tag/create", {
+        method: "POST",
+        headers: {
+          authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name: newTagName }),
+      });
+
+      if (response.ok) {
+        const newTag = await response.json();
+        if (!selectedTags) {
+          setSelectedTags([newTag.id]);
+        } else {
+          setSelectedTags([...selectedTags, newTag.id]);
+        }
+        availableTags.push(newTag);
+        setNewTagName("");
+      } else {
+        throw new Error(`${response.status}: ${response.statusText}`);
+      }
+    } catch (err: any) {
+      setError(err.message);
+    }
+  };
 
   const handleTagChange = (tagId: number) => {
     setSelectedTags((prevTags) =>
@@ -168,6 +200,23 @@ const handleTemplateChange = (templateId: number) => {
             required
             className="w-full h-28 border border-gray-300 rounded-lg p-3 focus:ring-blue-500 focus:border-blue-500 text-md text-gray-700"
           />
+        </div>
+        
+        <div className="flex items-center space-x-2">
+          <input
+            type="text"
+            value={newTagName}
+            onChange={(e) => setNewTagName(e.target.value)}
+            placeholder="Add new tag"
+            className="flex-1 text-gray-700 border p-2 rounded"
+          />
+          <button
+            type="button"
+            onClick={handleNewTagSave}
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+            Add Tag
+          </button>
         </div>
 
         {/* Tags Section */}
