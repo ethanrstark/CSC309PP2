@@ -62,15 +62,28 @@ Scriptorium is a platform that combines code writing, execution, and management 
 
 ---
 
-## **Setup and Installation**
+## **Prerequisites**
 
-### **Prerequisites**
-- Node.js (>=16.0.0)
-- Docker
-- PostgreSQL
+Before you clone this repository and run the project, ensure you have the following installed:
+- Node.js: Version 18.x (LTS) or higher.
+- Docker: Version 19.x or higher.
 
-### **Installation**
+
+## **Setup**
+
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-repo/scriptorium.git
-   cd scriptorium
+   git clone https://github.com/ethanrstark/scriptorium.git
+   cd scriptorium/PP2
+   ```
+2. Change permissions on scripts to make sure they are executable:
+   ```bash
+   chmod +x startup.sh
+   chmod +x run.sh
+   ```
+3. Run both scripts to install dependencies and start the server:
+   ```bash
+   ./startup.sh
+   ./run.sh
+   ```
+4. Open the application in your browser at http://localhost:3000
